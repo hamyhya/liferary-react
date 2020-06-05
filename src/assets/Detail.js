@@ -1,10 +1,7 @@
 import React, {Component} from 'react'
-import {Col, Row, Button} from 'reactstrap'
-import {
-  BrowserRouter as Router,
-  Link
-} from "react-router-dom";
+import {Col, Row} from 'reactstrap'
 
+import dilanhalf from '../assets/dilan-half.png'
 import dilanfull from '../assets/dilan-full.png'
 
 class Detail extends Component {
@@ -13,14 +10,7 @@ class Detail extends Component {
       <>
         <div className="details">
           <div className="half-cover">
-            <div className='w-100 cover-content d-flex justify-content-between p-4'>
-              <div className='back'>
-                <Link to='/dashboard' className='btn back-btn btn-lg btn-dark'>Back</Link>
-              </div>
-              <div className='option-btn'>
-              <h3><Link><a>Edit</a></Link> | <Link><a>Delete</a></Link></h3>
-              </div>
-            </div>
+            <img className='img-fluid' src={dilanhalf} alt="half-cover" />
           </div>
           <div className="full-cover w-100 d-flex justify-content-end container">
             <img className='img-fluid' src={dilanfull} alt="full-cover" />
