@@ -8,7 +8,6 @@ html, body, #root {
 }
 .login-overlay {
   padding: 30px;
-  background-color: rgba(0,0,0,0.5);
 }
 .login-overlay h1 {
   font-size: 50px;
@@ -24,46 +23,58 @@ html, body, #root {
   border: 0;
 }
 .login-form .right-btn {
-  background-color: black;
+  background-color: #34325E;
   color: white;
   border-radius: 5px;
 }
 .login-form .right-btn:hover {
-  background-color: rgb(61, 61, 61);
-  color: white;
+  background-color: white;
+  color: #34325E;
+  border: 1px solid #34325E;
   border-radius: 5px;
 }
 .login-form .left-btn {
-  background: #FFFFFF;
-  border: 1px solid rgb(160, 157, 157);
-  box-sizing: border-box;
+  background-color: white;
+  color: #34325E;
+  border: 1px solid #34325E;
   border-radius: 5px;
-  color: rgb(160, 157, 157);
 }
 .login-form .left-btn:hover {
-  background: rgb(223, 222, 222);
-  border: 1px solid rgb(160, 157, 157);
+  background: #34325E;
   box-sizing: border-box;
   border-radius: 5px;
-  color: rgb(160, 157, 157);
+  color: white;
 }
 .half-cover {
-  height: 425px;
-  background-image: url('./dilan-half.png');
-  background-size: contain;
+  height: 350px;
+  background-color: #34325E;
 }
 .option-btn a {
-  color: black;
+  color: white;
 }
 .full-cover img{
   margin-top: -200px;
+  background-color: white;
+  border-radius: 15px;
 }
 .book-details {
   margin-top: -50px;
 }
+.badge-detail {
+  background-color: #34325E;
+}
+.btn-borrow {
+  border: 2px solid #34325E;
+  color: #34325E;
+}
+.btn-borrow:hover {
+  background-color: #34325E;
+  color: white;
+}
 .sidebar {
   box-shadow: 2px 5px 5px rgba(0,0,0,0.5);
-  background-color: white;
+  background-color: #34325E;
+  color: white;
 }
 .profile-img img{
   border-radius: 50px;
@@ -71,16 +82,52 @@ html, body, #root {
 .sidebar-list {
   list-style-type: none;
 }
-.navbar {
+.nav-dashboard {
   box-shadow: 2px 5px 5px rgba(0,0,0,0.5);
-  margin-left: 225px;
+  margin-left: 210px;
+  background-color: #34325E;
 }
 .list-book {
-  margin-left: 225px;
+  margin-left: 210px;
 }
 .list-book-content {
   padding: 100px;
 }
 .card-title a{
   color: black;
+}
+.btn-add-admin {
+  background-color: #34325E;
+  color: white;
+}
+.btn-add-admin:hover {
+  background-color: rgb(76, 73, 129);
+  color: white;
+}
+.landing-jumbotron {
+  background-image: url('./jumbotron-cover.png');
+  background-size: cover;
+}
+.jumbotron-content {
+  padding-bottom: 100px;
+}
+.find-book {
+  border-radius: 0;
+  border: none;
+  border-bottom: 4px solid #34325E;
+}
+.btn-go {
+  background-color: white;
+  border: 2px solid #34325E;
+  color: #34325E;
+}
+
+.btn-go:hover {
+  background-color: #34325E;
+  color: white;
+}
+.footer {
+  margin-top: 50px;
+  height: 50px;
+  background-color: #34325E;
 }

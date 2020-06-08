@@ -32,8 +32,7 @@ class Login extends Component {
         <Row className='h-100 no-gutters'>
           <Col md={7} className='login-cover'>
             <div className='d-flex flex-column justify-content-between login-overlay w-100 h-100'>
-              <h1 className='text-white'>Book is a window <br/>to the world</h1>
-              <div className='text-white'>Photo by Mark Pan4ratte on Unsplash</div>
+              <h1 className='text-white'>Book is a window <br/>to the world.</h1>
             </div>
           </Col>
           <Col md={5}>

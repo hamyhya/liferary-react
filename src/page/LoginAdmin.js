@@ -6,7 +6,7 @@ import {
   Link
 } from "react-router-dom";
 
-class Login extends Component {
+class LoginAdmin extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -42,8 +42,8 @@ class Login extends Component {
               </div>
               <div className='flex-grow-1 d-flex justify-content-center align-items-center'>
                 <Form className='login-form mb-5'>
-                  <h1>Login</h1>
-                  <p>Welcome Back, Please Login to your account! :)</p>
+                  <h1>Login Admin</h1>
+                  <p>Enjoy your work today! :)</p>
                   <div className='input-wrapper no-gutter'>
                     <FormGroup className='form-group'>
                       <Label className='w-100'>
@@ -63,11 +63,10 @@ class Login extends Component {
                         <span>Remember Me</span>
                       </Label>
                     </FormGroup>
-                    <div><a href='#'><Link to='/admin'>Administrator</Link></a></div>
+                    <div><a href='#'><Link to='/login'>User</Link></a></div>
                   </div>
                   <div className='mt-4'>
                     <Link className='btn right-btn' to='/dashboard'>Login</Link>
-                    <Link className='btn left-btn ml-2' to='/register'>Sign Up</Link>
                   </div>
                   <div className='d-flex flex-column mt-5'>
                     <div>By signing up, you agree to Liferary’s</div>
@@ -83,4 +82,4 @@ class Login extends Component {
   }
 }
 
-export default Login
+export default LoginAdmin

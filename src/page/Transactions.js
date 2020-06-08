@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
-  ModalHeader, ModalFooter, Input} from 'reactstrap'
+  ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
 import {
   BrowserRouter as Router,
   Link
@@ -11,7 +11,7 @@ import logo from '../assets/smeatech.png'
 import profile from '../assets/profile.png'
 import card from '../assets/dilan-card.png'
 
-class List extends Component {
+class Transactions extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -19,14 +19,26 @@ class List extends Component {
       data: []
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
+    this.toggleEditModal = this.toggleEditModal.bind(this)
+    this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
   toggleAddModal(){
     this.setState({
       showAddModal: !this.state.showAddModal
     })
   }
+  toggleEditModal(){
+    this.setState({
+      showEditModal: !this.state.showEditModal
+    })
+  }
+  toggleDeleteModal(){
+    this.setState({
+      showDeleteModal: !this.state.showDeleteModal
+    })
+  }
   async componentDidMount(){
-    const results = await axios.get('http://localhost:8080/books')
+    const results = await axios.get('http://localhost:8080/transactions')
     const {data} = results.data
     this.setState({data})
   }
@@ -43,7 +55,7 @@ class List extends Component {
               </div>
               <div className='pt-5'>
                 <ul className className='sidebar-list'>
-                  <li className='pt-2'><h5>
+                <li className='pt-2'><h5>
                     <Link to='/dashboard'><a className='text-white' href=''>Dashboard</a></Link>  
                   </h5></li>
                   <li className='pt-2'><h5>
@@ -86,28 +98,36 @@ class List extends Component {
             </Row>
             <Row className='w-100 list-book'>
               <Col className='list-book-content'>
-              <Row className='d-flex justify-content-between'>
-                  <Col>
-                  <h4>List Books</h4>
-                  </Col>
-                  <Col className='d-flex justify-content-end'>
-                  <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Book</Button>
-                  </Col>
-                </Row>
+                <h4>List Transactions</h4>
                 <Row>
-                {this.state.data.map((book, index) => (
-                  <Col md={4}>
-                    <div className="card-deck p-2 mt-4 col-md-12">
-                      <div className="card">
-                        <img className="card-img-top" src={card} alt="Card image cap" />
-                        <div className="card-body">
-                          <h5 className="card-title"><Link to={'/detail/'+book.id}><a classNameName='text-black'>{book.title}</a></Link></h5>
-                          <p className="card-text">{book.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </Col>
-                ))}
+                  <Table bordered className='mt-5'>
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Book</th>
+                        <th>User</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {this.state.data.map((transactions, index) => (
+                      <tr>
+                        <th scope="row">{transactions.id}</th>
+                        <td>{transactions.title}</td>
+                        <td>{transactions.user}</td>
+                        <td>{transactions.employee}</td>
+                        <td>{transactions.status}</td>
+                        <td>
+                        <h6>
+                          <Link><a className='text-warning' onClick={this.toggleEditModal}>Edit </a></Link>|
+                          <Link><a className='text-danger' onClick={this.toggleDeleteModal}> Delete</a></Link></h6>
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
                 </Row>
               </Col>
             </Row>
@@ -130,19 +150,42 @@ class List extends Component {
             <h6>Author</h6>
             <Input type='text' className='mb-2'/>
             <h6>Genre</h6>
-            <Input type="select" name="select" id="exampleSelect">
-              <option>1</option>
-              <option>2</option>
-            </Input>
+            <Input type='text' className='mb-2'/>
           </ModalBody>
           <ModalFooter>
             <Button color='primary' onClick=''>Add</Button>
             <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
           </ModalFooter>
         </Modal>
+
+        {/* Edit Modal */}
+        <Modal isOpen={this.state.showEditModal}>
+          <ModalHeader className='h1'>Edit Transaction</ModalHeader>
+          <ModalBody>
+            <h6>Status</h6>
+            <Input type="select" name="select" id="exampleSelect">
+              <option>Returned</option>
+              <option>Pending</option>
+              <option>Penalty</option>
+            </Input>
+          </ModalBody>
+          <ModalFooter>
+            <Button color='primary' onClick=''>Edit</Button>
+            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
+
+         {/* Delete Modal */}
+         <Modal isOpen={this.state.showDeleteModal}>
+            <ModalBody className='h4'>Are you sure?</ModalBody>
+            <ModalFooter>
+              <Button color='danger' onClick=''>Delete</Button>
+              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
       </>
     )
   }
 }
 
-export default List
+export default Transactions
