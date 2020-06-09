@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
 import {
@@ -16,6 +17,7 @@ class Transactions extends Component {
     super(props)
     this.state = {
       showAddModal: false,
+      pageInfo: {},
       data: []
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
@@ -37,13 +39,31 @@ class Transactions extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  async componentDidMount(){
-    const results = await axios.get('http://localhost:8080/transactions')
+  fetchData = async (params) => {
+    this.setState({isLoading: true})
+    const {REACT_APP_URL} = process.env
+    const param = `${qs.stringify(params)}`
+    const url = `${REACT_APP_URL}transactions?${param}`
+    const results = await axios.get(url)
     const {data} = results.data
-    this.setState({data})
+    const pageInfo = results.data.pageInfo
+    this.setState({data, pageInfo, isLoading: false})
+    if(params){
+      this.props.history.push(`?${param}`)
+    }
+  }
+  async componentDidMount(){
+    const param = qs.parse(this.props.location.search.slice(1))
+    await this.fetchData(param)
   }
 
   render(){
+    const params = qs.parse(this.props.location.search.slice(1))
+    params.page = params.page || 1
+    params.sort = 0
+    var options = [],
+    optionState = this.props.optionState
+    console.log(optionState)
     return(
       <>
         <Row className='w-100 h-100 no-gutters'>
@@ -99,8 +119,10 @@ class Transactions extends Component {
             <Row className='w-100 list-book'>
               <Col className='list-book-content'>
                 <h4>List Transactions</h4>
-                <Row>
-                  <Table bordered className='mt-5'>
+                <Row className='mt-5'>
+                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>} &nbsp;|&nbsp;
+                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}> Desc</Button>}
+                  <Table bordered className='mt-2'>
                     <thead>
                       <tr>
                         <th>Id</th>
@@ -128,6 +150,26 @@ class Transactions extends Component {
                       ))}
                     </tbody>
                   </Table>
+                </Row>
+                <Row className='mt-5 mb-5 container d-flex justify-content-center'>
+                  <Col md={12} className='d-flex justify-content-center'>
+                    <div className='pagination-btn d-flex flex-row justify-content-between'>
+                      <div>
+                        {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                        
+                      </div>
+                      <div>
+                        {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                          return (
+                          <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                          )
+                        })}
+                      </div>
+                      <div>
+                        <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                      </div>
+                    </div>
+                  </Col>
                 </Row>
               </Col>
             </Row>

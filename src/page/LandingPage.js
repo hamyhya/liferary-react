@@ -40,6 +40,7 @@ class LandingPage extends Component {
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.sort = 0
+    params.search = ''
     return(
       <>
         <div className='landing-page'>
@@ -69,21 +70,36 @@ class LandingPage extends Component {
             <h1 className='d-flex justify-content-center'>Checkout Our Collections!</h1>
             <div className='d-flex justify-content-center mt-4'>
               <Form className="form-inline d-flex justify-content-center col-md-7">
-                <input className="find-book form-control col-md-6" type="search" placeholder="Find some book ..." aria-label="Search" />
+                <input className="find-book form-control col-md-6" type="search" placeholder="Find some books ..." aria-label="Search" />
                 <button className="btn btn-go ml-3" id='content' type="submit">Go!</button>
               </Form>
             </div>
             <div className='d-flex justify-content-center'>
-            <Row className='w-100 mt-5 container'>
+            <Row className='mt-5 container'>
               <Col className='list-book-landing d-flex justify-content-center'>
                 <Row className=''>
                 {this.state.data.map((book, index) => (
                     <Col md={4}>
                       <div className="card-deck mt-4">
-                        <div className="card">
-                          <img className="card-img-top" src={card} alt="Card image cap" />
+                        <div className="card card-landing">
+                          <div className='card-img-landing bg-contain' style={{backgroundImage: `url(${book.picture})`}}>
+                          {/* <img className="card-img-top" src={book.picture} alt="Card image cap" /> */}
+                        </div>
                           <div className="card-body">
-                            <h5 className="card-title"><Link to={'/detail/'+book.id}><a classNameName='text-black'>{book.title}</a></Link></h5>
+                            <h5 className="card-title">
+                              <Link to={{
+                              pathname: `/detail/${book.id}`,
+                              state: {
+                                id: `${book.id}`,
+                                title: `${book.title}`,
+                                description: `${book.description}`,
+                                genre: `${book.genre}`,
+                                author: `${book.genre}`,
+                                picture: `${book.picture}`
+                              }
+                            }}><a classNameName='text-black'>{book.title}</a>
+                              </Link>
+                            </h5>
                             <p className="card-text">{book.description}</p>
                           </div>
                         </div>
@@ -95,15 +111,12 @@ class LandingPage extends Component {
             </Row>
             </div>
           </div>
-          <Row className='mt-5 mb-5'>
-                <Col md={12}>
-                  <div className='d-flex flex-row justify-content-between'>
+          <Row className='mt-5 mb-5 container d-flex justify-content-center'>
+                <Col md={12} className='d-flex justify-content-center'>
+                  <div className='pagination-btn d-flex flex-row justify-content-between'>
                     <div>
                       {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                      <Input type="select" name="select" id="exampleSelect">
-                        <option>1</option>
-                        <option><Input onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Input></option>
-                      </Input>
+                      
                     </div>
                     <div>
                       {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{

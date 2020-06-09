@@ -28,7 +28,7 @@ class App extends Component {
             <Route path='/dashboard' component={List} />
             <Route path='/administrators' component={Administrators} />
             <Route path='/transactions' component={Transactions} />
-            <Route path='/detail' component={Detail} />
+            <Route path='/detail/:id' component={Detail} />
           </Switch>
         </BrowserRouter>
       </>

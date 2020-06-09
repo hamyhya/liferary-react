@@ -53,9 +53,12 @@ html, body, #root {
   color: white;
 }
 .full-cover img{
+  width: 230px;
+  height: 319px;
   margin-top: -200px;
   background-color: white;
   border-radius: 15px;
+  padding: 10px;
 }
 .book-details {
   margin-top: -50px;
@@ -93,6 +96,10 @@ html, body, #root {
 .list-book-content {
   padding: 100px;
 }
+.card-img {
+  width: 220px;
+  height: 200px;
+}
 .card-title a{
   color: black;
 }
@@ -102,6 +109,14 @@ html, body, #root {
 }
 .btn-add-admin:hover {
   background-color: rgb(76, 73, 129);
+  color: white;
+}
+.btn-sort button {
+  background-color: #34325E;
+  color: white;
+}
+.btn-sort button:hover {
+  background-color: rgb(79, 76, 146);
   color: white;
 }
 .landing-jumbotron {
@@ -121,9 +136,23 @@ html, body, #root {
   border: 2px solid #34325E;
   color: #34325E;
 }
-
 .btn-go:hover {
   background-color: #34325E;
+  color: white;
+}
+.card-landing {
+  width: 335px;
+}
+.card-img-landing {
+  width: 335px;
+  height: 200px;
+}
+.btn-sort, .pagination-btn button {
+  background-color: #34325E;
+  color: white;
+}
+.btn-sort:hover, .pagination-btn button:hover {
+  background-color: rgb(79, 76, 146);
   color: white;
 }
 .footer {

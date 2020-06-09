@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input} from 'reactstrap'
 import {
@@ -16,6 +17,7 @@ class List extends Component {
     super(props)
     this.state = {
       showAddModal: false,
+      pageInfo: {},
       data: []
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
@@ -25,13 +27,28 @@ class List extends Component {
       showAddModal: !this.state.showAddModal
     })
   }
-  async componentDidMount(){
-    const results = await axios.get('http://localhost:8080/books')
+  fetchData = async (params) => {
+    this.setState({isLoading: true})
+    const {REACT_APP_URL} = process.env
+    const param = `${qs.stringify(params)}`
+    const url = `${REACT_APP_URL}books?${param}`
+    const results = await axios.get(url)
     const {data} = results.data
-    this.setState({data})
+    const pageInfo = results.data.pageInfo
+    this.setState({data, pageInfo, isLoading: false})
+    if(params){
+      this.props.history.push(`?${param}`)
+    }
+  }
+  async componentDidMount(){
+    const param = qs.parse(this.props.location.search.slice(1))
+    await this.fetchData(param)
   }
 
   render(){
+    const params = qs.parse(this.props.location.search.slice(1))
+    params.page = params.page || 1
+    params.sort = 0
     return(
       <>
         <Row className='w-100 h-100 no-gutters'>
@@ -94,27 +111,66 @@ class List extends Component {
                   <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Book</Button>
                   </Col>
                 </Row>
+                <div className='mt-5'>
+                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
+                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+                </div>
                 <Row>
                 {this.state.data.map((book, index) => (
                   <Col md={4}>
-                    <div className="card-deck p-2 mt-4 col-md-12">
+                    <div className="card-deck p-2 mt-2 col-md-12">
                       <div className="card">
-                        <img className="card-img-top" src={card} alt="Card image cap" />
+                        <div className='card-img bg-contain' style={{backgroundImage: `url(${book.picture})`}}>
+                          {/* <img className="card-img-top" src={book.picture} alt="Card image cap" /> */}
+                        </div>
                         <div className="card-body">
-                          <h5 className="card-title"><Link to={'/detail/'+book.id}><a classNameName='text-black'>{book.title}</a></Link></h5>
+                          <h5 className="card-title">
+                            <Link to={{
+                              pathname: `/detail/${book.id}`,
+                              state: {
+                                id: `${book.id}`,
+                                title: `${book.title}`,
+                                description: `${book.description}`,
+                                genre: `${book.genre}`,
+                                author: `${book.genre}`,
+                                picture: `${book.picture}`
+                              }
+                            }}><a classNameName='text-black'>{book.title}</a>
+                            </Link>
+                          </h5>
                           <p className="card-text">{book.description}</p>
                         </div>
                       </div>
                     </div>
                   </Col>
                 ))}
+                <Row className='mt-5 mb-5 container d-flex justify-content-center'>
+                  <Col md={12} className='d-flex justify-content-center'>
+                    <div className='pagination-btn d-flex flex-row justify-content-between'>
+                      <div>
+                        {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                        
+                      </div>
+                      <div>
+                        {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                          return (
+                          <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                          )
+                        })}
+                      </div>
+                      <div>
+                        <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
                 </Row>
               </Col>
             </Row>
           </Col>
-            <div className='footer w-100 d-flex justify-content-center align-items-center'>
-              <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
-            </div>
+          <div className='footer w-100 d-flex justify-content-center align-items-center'>
+            <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
+          </div>
         </Row>
 
         {/* Add Modal */}
