@@ -90,6 +90,9 @@ html, body, #root {
   margin-left: 210px;
   background-color: #34325E;
 }
+.carousel-books {
+  background-color: #34325E;
+}
 .list-book {
   margin-left: 210px;
 }

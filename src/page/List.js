@@ -3,6 +3,8 @@ import axios from 'axios'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input} from 'reactstrap'
+import { Carousel, Jumbotron } from 'react-bootstrap'
+
 import {
   BrowserRouter as Router,
   Link
@@ -44,11 +46,13 @@ class List extends Component {
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
+  
 
   render(){
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.sort = 0
+    params.search = ''
     return(
       <>
         <Row className='w-100 h-100 no-gutters'>
@@ -94,7 +98,7 @@ class List extends Component {
                     </ul>
                     <span className="navbar-text">
                     <Form class="form-inline">
-                      <input class="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Input onClick={()=>this.fetchData({...params, search: target.value})} class="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
                     </Form>
                     </span>
                   </div>
@@ -111,9 +115,27 @@ class List extends Component {
                   <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Book</Button>
                   </Col>
                 </Row>
+                <Jumbotron className='carousel-books mt-5'>
+                  <Carousel>
+                    {this.state.data.map((book, index) => (
+                      <Carousel.Item>
+                        <img style={{ height: '200px' }}
+                          className="d-block"
+                          src={book.picture}
+                           alt="cover"
+                        />
+                        <Carousel.Caption>
+                          <h3 className="text-white">{book.title}</h3>
+                          <p>{book.description}</p>
+                        </Carousel.Caption>
+                      </Carousel.Item>
+                    ))}
+                  </Carousel>
+                </Jumbotron>
                 <div className='mt-5'>
                   {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}&nbsp;|&nbsp;
+                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, search: 'dilan'})}>Dilan</Button>}
                 </div>
                 <Row>
                 {this.state.data.map((book, index) => (
