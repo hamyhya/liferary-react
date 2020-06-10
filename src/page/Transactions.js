@@ -83,6 +83,9 @@ class Transactions extends Component {
                   <li className='pt-2'><h5>
                     <Link to='/administrators'><a className='text-white' href=''>Administrators</a></Link>
                   </h5></li>
+                  <li className='pt-2'><h5>
+                    <Link to='/users'><a className='text-white' href=''>Users</a></Link>
+                  </h5></li>
                 </ul>
               </div>
             </div>
@@ -129,7 +132,7 @@ class Transactions extends Component {
                         <th>Book</th>
                         <th>User</th>
                         <th>Employee</th>
-                        <th>Status</th>
+                        <th>Date</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -140,7 +143,7 @@ class Transactions extends Component {
                         <td>{transactions.title}</td>
                         <td>{transactions.user}</td>
                         <td>{transactions.employee}</td>
-                        <td>{transactions.status}</td>
+                        <td>{transactions.created_at}</td>
                         <td>
                         <h6>
                           <Link to={{
@@ -150,7 +153,7 @@ class Transactions extends Component {
                                 title: `${transactions.title}`,
                                 user: `${transactions.user}`,
                                 employee: `${transactions.employee}`,
-                                status: `${transactions.status}`
+                                created_at: `${transactions.created_at}`
                               }
                             }}><a>More...</a></Link></h6>
                         </td>

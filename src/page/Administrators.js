@@ -50,13 +50,18 @@ class Administrators extends Component {
       })
       .catch(function (error) {
         console.log(error.response)
+        swal.fire({
+					icon: 'error',
+					title: 'Oops!',
+					text: "Something's wrong, I can feel it"
+				})
        }) 
        swal.fire({
         icon: 'success',
         title: 'Success',
         text: 'Yay! add admin success'
       })
-       this.props.history.push('/dashboard')
+       this.props.history.push('/dashboards')
 }
   toggleAddModal(){
     this.setState({
@@ -115,6 +120,9 @@ class Administrators extends Component {
                   </h5></li>
                   <li className='pt-2'><h5>
                     <Link to='/administrators'><a className='text-white' href=''>Administrators</a></Link>
+                  </h5></li>
+                  <li className='pt-2'><h5>
+                    <Link to='/users'><a className='text-white' href=''>Users</a></Link>
                   </h5></li>
                 </ul>
               </div>

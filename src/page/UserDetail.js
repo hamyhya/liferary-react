@@ -13,7 +13,7 @@ import logo from '../assets/smeatech.png'
 import profile from '../assets/profile.png'
 import card from '../assets/dilan-card.png'
 
-class AdministratorsDetail extends Component {
+class UserDetail extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -24,11 +24,10 @@ class AdministratorsDetail extends Component {
       id: props.match.params.id,
       name: props.location.state.name,
       email: props.location.state.email,
-      password: props.location.state.password,
+      created_at: props.location.state.created_at,
       data: []
     }
-    this.handlerUpdate = this.handlerUpdate.bind(this)
-    this.deleteAdmin = this.deleteAdmin.bind(this)
+    this.deleteTransaction = this.deleteTransaction.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
@@ -41,48 +40,18 @@ class AdministratorsDetail extends Component {
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
-  handlerUpdate = (event) => {
-    event.preventDefault()
-    this.setState({isLoading: true})
-    const authorData = {
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password
-    }
-    
-    console.log(authorData)
+  deleteTransaction(){
     const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}employes/${this.state.id}`
-    axios.patch(url, authorData).then( (response) => {
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error.response)
-        swal.fire({
-					icon: 'error',
-					title: 'Oops!',
-					text: "Something's wrong, I can feel it"
-				})
-       }) 
-       swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Yahaha! edit admin success'
-      })
-      this.props.history.push('/administrators')
-}
-deleteAdmin(){
-  const {REACT_APP_URL} = process.env
-  console.log(this.state.id)
-  axios.delete(`${REACT_APP_URL}employes/${this.state.id}`)
-  this.setState({showDeleteModal: !this.state.showDeleteModal})
-  this.props.history.push('/administrators')
-  swal.fire({
-    icon: 'success',
-    title: 'Success',
-    text: 'Poof! delete admin success'
-  })
-}
+    console.log(this.state.id)
+    axios.delete(`${REACT_APP_URL}users/${this.state.id}`)
+    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.props.history.push('/users')
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Poof! User deleted'
+    })
+  }
   toggleAddModal(){
     this.setState({
       showAddModal: !this.state.showAddModal
@@ -175,21 +144,24 @@ deleteAdmin(){
               <Col className='list-book-content'>
                 <div className='detail-wrapper'>
                   <div>
-                  <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> > Detail</h4>
+                  <h4><Link to='/users'><a className='text-dark mb-5'>Users</a></Link> > Detail</h4>
                   </div>
                   <Table bordered className='mt-5'>
                       <tr>
                         <td><h6>Name</h6></td>
-                        <td>{this.state.email}</td>
+                        <td>{this.state.name}</td>
                       </tr>
                       <tr>
                         <td><h6>Email</h6></td>
                         <td>{this.state.email}</td>
                       </tr>
+                      <tr>
+                        <td><h6>Joined</h6></td>
+                        <td>{this.state.created_at}</td>
+                      </tr>
                   </Table>
                   <div className='mt-4'>
-                    <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>
-                    <Button className='btn-danger ml-3' onClick={this.toggleDeleteModal}>Delete</Button>
+                    <Button className='btn-danger' onClick={this.toggleDeleteModal}>Delete This User</Button>
                   </div>
                 </div>
               </Col>
@@ -240,7 +212,7 @@ deleteAdmin(){
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick={this.deleteAdmin}>Delete</Button>
+              <Button color='danger' onClick={this.deleteTransaction}>Delete</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -249,4 +221,4 @@ deleteAdmin(){
   }
 }
 
-export default AdministratorsDetail
+export default UserDetail

@@ -59,6 +59,11 @@ class Detail extends Component {
       })
       .catch(function (error) {
         console.log(error.response)
+        swal.fire({
+					icon: 'error',
+					title: 'Oops!',
+					text: "Something's wrong, I can feel it"
+				})
        }) 
        this.setState({ showBorrowModal: !this.state.showBorrowModal })
        this.props.history.push('/transactions')
@@ -89,11 +94,9 @@ class Detail extends Component {
     swal.fire({
       icon: 'success',
       title: 'Success',
-      text: 'Poof! delete success',
-      footer: '<a href>Why do I have this issue?</a>',
-      showOkButton: false
+      text: 'Poof! delete success'
     })
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.props.history.push('/dashboard')
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
@@ -119,9 +122,11 @@ class Detail extends Component {
       })
       .catch(function (error) {
         console.log(error.response);
-  
-        /*    console.log(response)
-           console.log(response.data.message) */
+        swal.fire({
+					icon: 'error',
+					title: 'Oops!',
+					text: "Something's wrong, I can feel it"
+				})
        }) 
        
        this.setState({showSuccessModal: !this.state.showSuccessModal})
