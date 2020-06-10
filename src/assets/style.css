@@ -90,6 +90,16 @@ html, body, #root {
   margin-left: 210px;
   background-color: #34325E;
 }
+.btn-search {
+  background-color: #34325E;
+  color: white;
+  border: 1px solid white;
+}
+.btn-search:hover {
+  background-color: #34325E;
+  color: white;
+  border: 1px solid white;
+}
 .carousel-books {
   background-color: #34325E;
 }
@@ -121,6 +131,9 @@ html, body, #root {
 .btn-sort button:hover {
   background-color: rgb(79, 76, 146);
   color: white;
+}
+.detail-wrapper {
+  height: 330px;
 }
 .landing-jumbotron {
   background-image: url('./jumbotron-cover.png');

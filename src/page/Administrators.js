@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
@@ -18,12 +19,45 @@ class Administrators extends Component {
     this.state = {
       showAddModal: false,
       pageInfo: {},
+      search: '',
+      name: '',
+      email: '',
+      password: '',
       data: []
     }
+    this.handlerSubmit = this.handlerSubmit.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
+  handlerChange = (e) => {
+    this.setState({ [e.target.name] : e.target.value })
+  }
+  handlerSubmit = (event) => {
+    event.preventDefault()
+    this.setState({isLoading: true})
+    const authorData = {
+        name: this.state.name,
+        email: this.state.email,
+        password: this.state.password
+    }
+    
+    console.log(authorData)
+    const {REACT_APP_URL} = process.env
+    const url = `${REACT_APP_URL}employes`
+    axios.post(url, authorData).then( (response) => {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error.response)
+       }) 
+       swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Yay! add admin success'
+      })
+       this.props.history.push('/dashboard')
+}
   toggleAddModal(){
     this.setState({
       showAddModal: !this.state.showAddModal
@@ -60,7 +94,8 @@ class Administrators extends Component {
   render(){
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
-    params.sort = 0
+    params.search = params.search || ''
+    params.sort = params.sort || 0
     return(
       <>
         <Row className='w-100 h-100 no-gutters'>
@@ -87,32 +122,33 @@ class Administrators extends Component {
           </Col>
           <Col md={10} className=''>
             <Row>
-              <Col>
-                <Nav className="navbar nav-dashboard navbar-expand-lg fixed-top">
-                  <a className="navbar-brand font-weight-bold text-white" href="#">
-                      Liferary
-                  </a>
-                  <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                  </button>
-                  <div className="collapse navbar-collapse" id="navbarText">
-                    <ul className="navbar-nav mr-auto">
-                      <li className="nav-item active">
-                        <a className="nav-link text-white" href="#">All Categories <span className="sr-only">(current)</span></a>
-                      </li>
-                      <li className="nav-item">
-                        <a className="nav-link text-white" href="#">All Time</a>
-                      </li>
-                    </ul>
-                    <span className="navbar-text">
-                    <Form class="form-inline">
-                      <input class="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
-                    </Form>
-                    </span>
-                  </div>
-                </Nav>
-              </Col>
-            </Row>
+                <Col>
+                  <Nav className="navbar nav-dashboard navbar-expand-lg fixed-top">
+                    <a className="navbar-brand font-weight-bold text-white" href="#">
+                        Liferary
+                    </a>
+                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                      <span className="navbar-toggler-icon"></span>
+                    </button>
+                    <div className="collapse navbar-collapse" id="navbarText">
+                      <ul className="navbar-nav mr-auto">
+                        <li className="nav-item active">
+                          <a className="nav-link text-white" href="#">All Categories <span className="sr-only">(current)</span></a>
+                        </li>
+                        <li className="nav-item">
+                          <a className="nav-link text-white" href="#">All Time</a>
+                        </li>
+                      </ul>
+                      <span className="navbar-text">
+                      <Form className="form-inline">
+                        <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                        <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
+                      </Form>
+                      </span>
+                    </div>
+                  </Nav>
+                </Col>
+              </Row>
             <Row className='w-100 list-book'>
               <Col className='list-book-content'>
                 <Row className='d-flex justify-content-between'>
@@ -142,8 +178,15 @@ class Administrators extends Component {
                         <td>{admin.name}</td>
                         <td>{admin.email}</td>
                         <td>
-                          <h6><Link><a className='text-warning' onClick={this.toggleEditModal}>Edit </a></Link>|
-                          <Link><a className='text-danger' onClick={this.toggleDeleteModal}> Delete</a></Link></h6> 
+                          <h6><Link to={{
+                              pathname: `/administrators-detail/${admin.id}`,
+                              state: {
+                                id: `${admin.id}`,
+                                name: `${admin.name}`,
+                                email: `${admin.email}`,
+                                password: `${admin.password}`
+                              }
+                            }}><a>More... </a></Link></h6> 
                         </td>
                       </tr>
                       ))}
@@ -180,19 +223,21 @@ class Administrators extends Component {
 
         {/* Add Modal */}
         <Modal isOpen={this.state.showAddModal}>
+          <Form onSubmit={this.handlerSubmit}>
           <ModalHeader className='h1'>Add Admin</ModalHeader>
           <ModalBody>
             <h6>Name</h6>
-            <Input type='text' className='mb-2'/>
+            <Input name='name' onChange={this.handlerChange} type='text' className='mb-2'/>
             <h6>Email</h6>
-            <Input type='text' className='mb-2'/>
+            <Input name='email' onChange={this.handlerChange} type='text' className='mb-2'/>
             <h6>Password</h6>
-            <Input type='password' className='mb-2'/>
+            <Input name='password' onChange={this.handlerChange} type='password' className='mb-2'/>
           </ModalBody>
           <ModalFooter>
-            <Button color='primary' onClick=''>Add</Button>
+            <Button color='primary' type='submit'>Add</Button>
             <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
           </ModalFooter>
+          </Form>
         </Modal>
         
          {/* Edit Modal */}

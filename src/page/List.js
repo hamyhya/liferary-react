@@ -20,6 +20,7 @@ class List extends Component {
     this.state = {
       showAddModal: false,
       pageInfo: {},
+      search: '',
       data: []
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
@@ -51,8 +52,8 @@ class List extends Component {
   render(){
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
-    params.sort = 0
-    params.search = ''
+    params.search = params.search || ''
+    params.sort = params.sort || 0
     return(
       <>
         <Row className='w-100 h-100 no-gutters'>
@@ -97,8 +98,9 @@ class List extends Component {
                       </li>
                     </ul>
                     <span className="navbar-text">
-                    <Form class="form-inline">
-                      <Input onClick={()=>this.fetchData({...params, search: target.value})} class="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                    <Form className="form-inline">
+                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
                     </Form>
                     </span>
                   </div>
@@ -134,8 +136,7 @@ class List extends Component {
                 </Jumbotron>
                 <div className='mt-5'>
                   {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}&nbsp;|&nbsp;
-                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, search: 'dilan'})}>Dilan</Button>}
+                  {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
                 </div>
                 <Row>
                 {this.state.data.map((book, index) => (
@@ -200,9 +201,9 @@ class List extends Component {
           <ModalHeader className='h1'>Add Book</ModalHeader>
           <ModalBody>
             <h6>Title</h6>
-            <Input type='text' className='mb-2'/>
+            <Input name='title' type='text' className='mb-2'/>
             <h6>Description</h6>
-            <Input type='text' className='mb-2'/>
+            <Input name='description' type='text' className='mb-2'/>
             <h6>Image URL</h6>
             <Input type='text' className='mb-2'/>
             <h6>Author</h6>

@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
@@ -12,19 +13,71 @@ import logo from '../assets/smeatech.png'
 import profile from '../assets/profile.png'
 import card from '../assets/dilan-card.png'
 
-class Transactions extends Component {
+class AdministratorsDetail extends Component {
   constructor(props){
     super(props)
     this.state = {
       showAddModal: false,
+      showSuccessModal: false,
       pageInfo: {},
       search: '',
+      id: props.match.params.id,
+      name: props.location.state.name,
+      email: props.location.state.email,
+      password: props.location.state.password,
       data: []
     }
+    this.handlerUpdate = this.handlerUpdate.bind(this)
+    this.deleteAdmin = this.deleteAdmin.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
+  home = (e) =>{
+    e.preventDefault()
+    
+    this.props.history.push('/administrators')
+  }
+  handlerChange = (e) => {
+    this.setState({ [e.target.name] : e.target.value })
+  }
+  handlerUpdate = (event) => {
+    event.preventDefault()
+    this.setState({isLoading: true})
+    const authorData = {
+        name: this.state.name,
+        email: this.state.email,
+        password: this.state.password
+    }
+    
+    console.log(authorData)
+    const {REACT_APP_URL} = process.env
+    const url = `${REACT_APP_URL}employes/${this.state.id}`
+    axios.patch(url, authorData).then( (response) => {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error.response)
+       }) 
+       swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Yahaha! edit admin success'
+      })
+      this.props.history.push('/administrators')
+}
+deleteAdmin(){
+  const {REACT_APP_URL} = process.env
+  console.log(this.state.id)
+  axios.delete(`${REACT_APP_URL}employes/${this.state.id}`)
+  this.setState({showDeleteModal: !this.state.showDeleteModal})
+  this.props.history.push('/administrators')
+  swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: 'Poof! delete admin success'
+  })
+}
   toggleAddModal(){
     this.setState({
       showAddModal: !this.state.showAddModal
@@ -44,7 +97,7 @@ class Transactions extends Component {
     this.setState({isLoading: true})
     const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}transactions?${param}`
+    const url = `${REACT_APP_URL}employes?${param}`
     const results = await axios.get(url)
     const {data} = results.data
     const pageInfo = results.data.pageInfo
@@ -106,121 +159,65 @@ class Transactions extends Component {
                           <a className="nav-link text-white" href="#">All Time</a>
                         </li>
                       </ul>
-                      <span className="navbar-text">
-                      <Form className="form-inline">
-                        <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
-                        <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
-                      </Form>
-                      </span>
                     </div>
                   </Nav>
                 </Col>
               </Row>
             <Row className='w-100 list-book'>
               <Col className='list-book-content'>
-                <h4>List Transactions</h4>
-                <Row className='mt-5'>
-                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>} &nbsp;|&nbsp;
-                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}> Desc</Button>}
-                  <Table bordered className='mt-2'>
-                    <thead>
-                      <tr>
-                        <th>Id</th>
-                        <th>Book</th>
-                        <th>User</th>
-                        <th>Employee</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.state.data.map((transactions, index) => (
-                      <tr>
-                        <th scope="row">{transactions.id}</th>
-                        <td>{transactions.title}</td>
-                        <td>{transactions.user}</td>
-                        <td>{transactions.employee}</td>
-                        <td>{transactions.status}</td>
-                        <td>
-                        <h6>
-                          <Link to={{
-                              pathname: `/transactions-detail/${transactions.id}`,
-                              state: {
-                                id: `${transactions.id}`,
-                                title: `${transactions.title}`,
-                                user: `${transactions.user}`,
-                                employee: `${transactions.employee}`,
-                                status: `${transactions.status}`
-                              }
-                            }}><a>More...</a></Link></h6>
-                        </td>
-                      </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Row>
-                <Row className='mt-5 mb-5 container d-flex justify-content-center'>
-                  <Col md={12} className='d-flex justify-content-center'>
-                    <div className='pagination-btn d-flex flex-row justify-content-between'>
-                      <div>
-                        {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                        
-                      </div>
-                      <div>
-                        {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                          return (
-                          <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                          )
-                        })}
-                      </div>
-                      <div>
-                        <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
+                <div className='detail-wrapper'>
+                  <div>
+                  <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> > Detail</h4>
+                  </div>
+                  <div className='mt-5'>
+                    <h5>Name : {this.state.name}</h5>
+                    <h5>Email : {this.state.email}</h5>
+                  </div>
+                  <div className='mt-4'>
+                    <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>
+                    <Button className='btn-danger ml-3' onClick={this.toggleDeleteModal}>Delete</Button>
+                  </div>
+                </div>
               </Col>
+                <div className='footer w-100 d-flex justify-content-center align-items-center'>
+                  <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
+                </div>
             </Row>
-          </Col>
-            <div className='footer w-100 d-flex justify-content-center align-items-center'>
-              <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
-            </div>
+            </Col>
         </Row>
 
         {/* Add Modal */}
         <Modal isOpen={this.state.showAddModal}>
-          <ModalHeader className='h1'>Add Book</ModalHeader>
+          <Form onSubmit={this.handlerUpdate}>
+          <ModalHeader className='h1'>Add Admin</ModalHeader>
           <ModalBody>
-            <h6>Title</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Description</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Image URL</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Author</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Genre</h6>
-            <Input type='text' className='mb-2'/>
+            <h6>Name</h6>
+            <Input name='name' onChange={this.handlerChange} type='text' className='mb-2'/>
+            <h6>Email</h6>
+            <Input name='email' onChange={this.handlerChange} type='text' className='mb-2'/>
+            <h6>Password</h6>
+            <Input name='password' onChange={this.handlerChange} type='password' className='mb-2'/>
           </ModalBody>
           <ModalFooter>
-            <Button color='primary' onClick=''>Add</Button>
+            <Button color='primary' type='submit'>Add</Button>
             <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
           </ModalFooter>
+          </Form>
         </Modal>
-
-        {/* Edit Modal */}
-        <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Transaction</ModalHeader>
+        
+         {/* Edit Modal */}
+         <Modal isOpen={this.state.showEditModal}>
+          <ModalHeader className='h1'>Edit Admin</ModalHeader>
           <ModalBody>
-            <h6>Status</h6>
-            <Input type="select" name="select" id="exampleSelect">
-              <option>Returned</option>
-              <option>Pending</option>
-              <option>Penalty</option>
-            </Input>
+            <h6>Name</h6>
+            <Input name='name' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.name}/>
+            <h6>Email</h6>
+            <Input name='email' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.email}/>
+            <h6>Password</h6>
+            <Input name='password' type='password' className='mb-2' onChange={this.handlerChange} value={this.state.password}/>
           </ModalBody>
           <ModalFooter>
-            <Button color='primary' onClick=''>Edit</Button>
+            <Button color='primary' onClick={this.handlerUpdate}>Edit</Button>
             <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
           </ModalFooter>
         </Modal>
@@ -229,7 +226,7 @@ class Transactions extends Component {
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick=''>Delete</Button>
+              <Button color='danger' onClick={this.deleteAdmin}>Delete</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -238,4 +235,4 @@ class Transactions extends Component {
   }
 }
 
-export default Transactions
+export default AdministratorsDetail

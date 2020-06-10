@@ -14,6 +14,7 @@ import LandingPage from './page/LandingPage'
 import LoginAdmin from './page/LoginAdmin'
 import Administrators from './page/Administrators'
 import Transactions from './page/Transactions'
+import AdministratorsDetail from './page/AdministratorDetail'
 
 class App extends Component {
   render(){
@@ -27,6 +28,7 @@ class App extends Component {
             <Route path='/register' component={Register} />
             <Route path='/dashboard' component={List} />
             <Route path='/administrators' component={Administrators} />
+            <Route path='/administrators-detail/:id' component={AdministratorsDetail} />
             <Route path='/transactions' component={Transactions} />
             <Route path='/detail/:id' component={Detail} />
           </Switch>
