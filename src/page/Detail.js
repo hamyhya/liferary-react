@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import qs from 'querystring'
 import swal from 'sweetalert2'
 import {Col, Row, Button, Modal, ModalHeader, 
   ModalBody, ModalFooter, Input, Form} from 'reactstrap'
@@ -104,21 +105,18 @@ class Detail extends Component {
   updateBook = (event) => {
     event.preventDefault()
     this.setState({isLoading: true})
-    const authorData = {
-        title: this.state.title,
-        description: this.state.description,
-        genre: this.state.genre,
-        author: this.state.author,
-        picture: this.state.picture
-    }
+    const bookData = new FormData()
+		bookData.append('picture', this.state.picture)
+		bookData.set('title', this.state.title)
+		bookData.set('description', this.state.description)
+		bookData.set('genre', this.state.genre)
+		bookData.set('author', this.state.author)
     
-    console.log(authorData)
+    console.log(bookData)
     const {REACT_APP_URL} = process.env
     const url = `${REACT_APP_URL}books/${this.state.id}`
-    axios.patch(url, authorData).then( (response) => {
+    axios.patch(url, bookData).then( (response) => {
         console.log(response)
-      /*   this.props.history.push('/author') */
-    
       })
       .catch(function (error) {
         console.log(error.response);
@@ -128,9 +126,31 @@ class Detail extends Component {
 					text: "Something's wrong, I can feel it"
 				})
        }) 
-       
-       this.setState({showSuccessModal: !this.state.showSuccessModal})
+       this.props.history.push('/dashboard')
+       this.fetchData()
+       swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: "Good! Update successfully"
+      })
   }
+  fetchData = async (params) => {
+		this.setState({isLoading: true})
+		const {REACT_APP_URL} = process.env
+		const param = `${qs.stringify(params)}`
+		const url = `${REACT_APP_URL}books?${param}`
+		const results = await axios.get(url)
+		const {data} = results.data
+		const pageInfo = results.data.pageInfo
+		this.setState({data, pageInfo, isLoading: false})
+		if(params){
+			this.props.history.push(`?${param}`)
+		}
+	}
+	async componentDidMount(){
+		const param = qs.parse(this.props.location.search.slice(1))
+		await this.fetchData(param)
+	}
   render(){
     return(
       <>
@@ -179,24 +199,24 @@ class Detail extends Component {
         {/* Edit Modal */}
         <Modal isOpen={this.state.showEditModal}>
           <ModalHeader className='h1'>Edit Book</ModalHeader>
-          <Form onSubmit={this.updateBook}>
-          <ModalBody>
-            <h6>Title</h6>
-            <Input type='text' name="title" className='mb-2' onChange={this.handlerChange} value={this.state.title}/>
-            <h6>Description</h6>
-            <Input type='text' name="description" className='mb-2' onChange={this.handlerChange} value={this.state.description}/>
-            <h6>Image URL</h6>
-            <Input type='text' name="picture" className='mb-2' value={this.state.picture} />
-            <h6>Author</h6>
-            <Input type='text' name="author" value={this.state.author} onChange={this.handlerChange} className='mb-2'/>
-            <h6>Genre</h6>
-            <Input type="text" name="genre" value={this.state.genre} onChange={this.handlerChange} id="exampleSelect" />
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' type='submit' >Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-          </Form>
+          	<Form>
+							<ModalBody>
+									<h6>Title</h6>
+									<Input type='text' name='title' className='mb-2 shadow-none' value={this.state.title} onChange={this.handlerChange}/>
+									<h6>Description</h6>
+									<Input type='text' name='description' className='mb-3 shadow-none' value={this.state.description} onChange={this.handlerChange}/>
+									<h6>Author</h6>
+									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
+									<h6>Genre</h6>
+									<Input type='text' name='genre' className='mb-3 shadow-none' onChange={this.handlerChange}/>
+									<h6>Image</h6>
+									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
+							</ModalBody>
+							<ModalFooter>
+									<Button color="primary" onClick={this.updateBook}>Edit Book</Button>
+									<Button color="secondary" onClick={this.toggleEditModal}>Cancel</Button>
+							</ModalFooter>
+						</Form>
         </Modal>
 
          {/* Delete Modal */}

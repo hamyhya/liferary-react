@@ -64,7 +64,7 @@ class List extends Component {
 			.catch(function (error) {
 				swal.fire({
 					icon: 'error',
-					title: 'Oops!',
+					title: 'haha!',
 					text: "Something's wrong, I can feel it"
 				})
 				console.log(error);
@@ -199,7 +199,7 @@ class List extends Component {
 																title: `${book.title}`,
 																description: `${book.description}`,
 																genre: `${book.genre}`,
-																author: `${book.genre}`,
+																author: `${book.author}`,
 																picture: `${book.picture}`
 															}
 														}}><a classNameName='text-black'>{book.title}</a>
