@@ -118,6 +118,9 @@ class Administrators extends Component {
                   <li className='pt-2'><h5>
                     <Link to='/transactions'><a className='text-white' href=''>Transactions</a></Link>
                   </h5></li>
+									<li className='pt-2'><h5>
+										<Link to='/histories'><a className='text-white' href=''>Histories</a></Link>
+									</h5></li>
                   <li className='pt-2'><h5>
                     <Link to='/administrators'><a className='text-white' href=''>Administrators</a></Link>
                   </h5></li>

@@ -177,7 +177,7 @@ class Detail extends Component {
               <Col md={8}>
                 <div className="info d-flex justify-content-between">
                   <h1>{this.state.title}</h1>
-                  <h5 className='d-flex align-items-center text-success'>Available</h5>
+                  {/* <h5 className='d-flex align-items-center text-success'>Available</h5> */}
                 </div>
                 <h5>By {this.state.author}</h5>
               </Col>
@@ -208,7 +208,7 @@ class Detail extends Component {
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<Input type='text' name='genre' className='mb-3 shadow-none' onChange={this.handlerChange}/>
+									<Input type='text' name='genre' className='mb-3 shadow-none' value={this.state.genre} onChange={this.handlerChange}/>
 									<h6>Image</h6>
 									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
 							</ModalBody>

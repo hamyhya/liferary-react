@@ -5,7 +5,6 @@ import {
   Route
 } from 'react-router-dom'
 
-import Greetings from './components/Greetings'
 import Register from './page/Register'
 import Detail from './page/Detail'
 import Login from './page/Login'
@@ -18,6 +17,8 @@ import AdministratorsDetail from './page/AdministratorDetail'
 import TransactionDetail from './page/TransactionDetail'
 import Users from './page/Users'
 import UserDetail from './page/UserDetail'
+import histories from './page/Histories'
+import Histories from './page/Histories'
 
 class App extends Component {
   render(){
@@ -37,6 +38,7 @@ class App extends Component {
             <Route path='/detail/:id' component={Detail} />
             <Route path='/users' component={Users} />
             <Route path='/users-detail/:id' component={UserDetail} />
+            <Route path='/histories' component={Histories} />
           </Switch>
         </BrowserRouter>
       </>

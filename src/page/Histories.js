@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
@@ -12,7 +13,7 @@ import logo from '../assets/smeatech.png'
 import profile from '../assets/profile.png'
 import card from '../assets/dilan-card.png'
 
-class Users extends Component {
+class Histories extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -21,6 +22,7 @@ class Users extends Component {
       search: '',
       data: []
     }
+    this.deleteHistory = this.deleteHistory.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
@@ -40,11 +42,22 @@ class Users extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
+  deleteHistory(){
+    const {REACT_APP_URL} = process.env
+    axios.delete(`${REACT_APP_URL}histories`)
+    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.props.history.push('/dashboard')
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Cling! History cleared'
+    })
+  }
   fetchData = async (params) => {
     this.setState({isLoading: true})
     const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}users?${param}`
+    const url = `${REACT_APP_URL}histories?${param}`
     const results = await axios.get(url)
     const {data} = results.data
     const pageInfo = results.data.pageInfo
@@ -124,7 +137,14 @@ class Users extends Component {
               </Row>
             <Row className='w-100 list-book'>
               <Col className='list-book-content'>
-                <h4>List Transactions</h4>
+                <Row className='d-flex justify-content-between'>
+                    <Col>
+                    <h4>Histories</h4>
+                    </Col>
+                    <Col className='d-flex justify-content-end'>
+                    <Button className='btn btn-danger' onClick={this.toggleDeleteModal}>Clear History</Button>
+                    </Col>
+                  </Row>
                 <Row className='mt-5'>
                 {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>} &nbsp;|&nbsp;
                 {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}> Desc</Button>}
@@ -132,31 +152,22 @@ class Users extends Component {
                     <thead>
                       <tr>
                         <th>Id</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Joined</th>
-                        <th>Actions</th>
+                        <th>Transaction ID</th>
+                        <th>Title</th>
+                        <th>User</th>
+                        <th>Employee</th>
+                        <th>Date</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.data.map((user, index) => (
+                      {this.state.data.map((history, index) => (
                       <tr>
-                        <th scope="row">{user.id}</th>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.created_at}</td>
-                        <td>
-                        <h6>
-                          <Link to={{
-                              pathname: `/users-detail/${user.id}`,
-                              state: {
-                                id: `${user.id}`,
-                                name: `${user.name}`,
-                                email: `${user.email}`,
-                                created_at: `${user.created_at}`
-                              }
-                            }}><a>More...</a></Link></h6>
-                        </td>
+                        <th scope="row">{history.id}</th>
+                        <td>{history.transaction_id}</td>
+                        <td>{history.title}</td>
+                        <td>{history.user}</td>
+                        <td>{history.employee}</td>
+                        <td>{history.date}</td>
                       </tr>
                       ))}
                     </tbody>
@@ -190,49 +201,11 @@ class Users extends Component {
             </div>
         </Row>
 
-        {/* Add Modal */}
-        <Modal isOpen={this.state.showAddModal}>
-          <ModalHeader className='h1'>Add Book</ModalHeader>
-          <ModalBody>
-            <h6>Title</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Description</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Image URL</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Author</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Genre</h6>
-            <Input type='text' className='mb-2'/>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Add</Button>
-            <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
-        {/* Edit Modal */}
-        <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Transaction</ModalHeader>
-          <ModalBody>
-            <h6>Status</h6>
-            <Input type="select" name="select" id="exampleSelect">
-              <option>Returned</option>
-              <option>Pending</option>
-              <option>Penalty</option>
-            </Input>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
          {/* Delete Modal */}
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick=''>Delete</Button>
+              <Button color='danger' onClick={this.deleteHistory}>Clear History</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -241,4 +214,4 @@ class Users extends Component {
   }
 }
 
-export default Users
+export default Histories
