@@ -26,7 +26,7 @@ class Detail extends Component {
       picture: props.location.state.picture,
       user_id: 0,
       employee_id: 0,
-      data: []
+      genreName: ''
     }
     this.deleteBook = this.deleteBook.bind(this)
     this.updateBook = this.updateBook.bind(this)
@@ -56,23 +56,23 @@ class Detail extends Component {
     const {REACT_APP_URL} = process.env
     const url = `${REACT_APP_URL}transactions`
     axios.post(url, authorData).then( (response) => {
-        console.log(response)
+        console.log(response) 
+        this.setState({ showBorrowModal: !this.state.showBorrowModal })
+        swal.fire({
+         icon: 'success',
+         title: 'Success',
+         text: 'Yay! borrow book success'
+       })
       })
       .catch(function (error) {
         console.log(error.response)
         swal.fire({
 					icon: 'error',
 					title: 'Oops!',
-					text: "Something's wrong, I can feel it"
+					text: "Book has been booked right now"
 				})
-       }) 
-       this.setState({ showBorrowModal: !this.state.showBorrowModal })
-       this.props.history.push('/transactions')
-       swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Yay! borrow book success'
-      })
+       })
+       this.props.history.push('/dashboard')
   }
   toggleEditModal(){
     this.setState({
@@ -134,22 +134,18 @@ class Detail extends Component {
         text: "Good! Update successfully"
       })
   }
-  fetchData = async (params) => {
+  fetchData = async () => {
 		this.setState({isLoading: true})
 		const {REACT_APP_URL} = process.env
-		const param = `${qs.stringify(params)}`
-		const url = `${REACT_APP_URL}books?${param}`
+		const url = `${REACT_APP_URL}genres/${this.state.genre}`
 		const results = await axios.get(url)
-		const {data} = results.data
-		const pageInfo = results.data.pageInfo
-		this.setState({data, pageInfo, isLoading: false})
-		if(params){
-			this.props.history.push(`?${param}`)
-		}
+    const {data} = results.data
+    return data
 	}
 	async componentDidMount(){
-		const param = qs.parse(this.props.location.search.slice(1))
-		await this.fetchData(param)
+    const data = await this.fetchData()
+    this.setState({genreName: data.name})
+    console.log(this.state.data)
 	}
   render(){
     return(
@@ -171,13 +167,14 @@ class Detail extends Component {
           </div>
           <div className="book-details container">
             <div className="tag">
-              <h4><span class="badge badge-detail text-white">{this.state.genre}</span></h4>
-            </div>
+              <h4><span class="badge badge-detail text-white">{this.state.genreName}</span></h4>
+              
+              </div>
             <Row>
               <Col md={8}>
                 <div className="info d-flex justify-content-between">
                   <h1>{this.state.title}</h1>
-                  {/* <h5 className='d-flex align-items-center text-success'>Available</h5> */}
+                   <h5 className='d-flex align-items-center text-success'>Available</h5>
                 </div>
                 <h5>By {this.state.author}</h5>
               </Col>
@@ -208,7 +205,10 @@ class Detail extends Component {
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<Input type='text' name='genre' className='mb-3 shadow-none' value={this.state.genre} onChange={this.handlerChange}/>
+									<select name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
+                    <option className="list-group-item bg-light" value={1}>Horror</option>
+                    <option className="list-group-item bg-light" value={2}>Comedy</option>
+                  </select> 
 									<h6>Image</h6>
 									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
 							</ModalBody>

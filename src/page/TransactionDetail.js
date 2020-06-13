@@ -182,7 +182,7 @@ class TransactionDetail extends Component {
               <Col className='list-book-content'>
                 <div className='detail-wrapper'>
                   <div>
-                  <h4><Link to='/transactions'><a className='text-dark mb-5'>Transactions</a></Link> > Detail</h4>
+                  <h4><Link to='/transactions'><a className='text-dark mb-5'>Transactions</a></Link> &gt; Detail</h4>
                   </div>
                   <Table bordered className='mt-5'>
                       <tr>

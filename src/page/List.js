@@ -64,7 +64,7 @@ class List extends Component {
 			.catch(function (error) {
 				swal.fire({
 					icon: 'error',
-					title: 'haha!',
+					title: 'Hmmm!',
 					text: "Something's wrong, I can feel it"
 				})
 				console.log(error);
