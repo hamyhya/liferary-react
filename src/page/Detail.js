@@ -26,7 +26,9 @@ class Detail extends Component {
       picture: props.location.state.picture,
       user_id: 0,
       employee_id: 0,
-      genreName: ''
+      genreName: '',
+      genreList: [],
+      adminList: []
     }
     this.deleteBook = this.deleteBook.bind(this)
     this.updateBook = this.updateBook.bind(this)
@@ -141,11 +143,27 @@ class Detail extends Component {
 		const results = await axios.get(url)
     const {data} = results.data
     return data
-	}
+  }
+  genreList = async () => {
+		this.setState({isLoading: true})
+		const {REACT_APP_URL} = process.env
+		const url = `${REACT_APP_URL}genres`
+		const results = await axios.get(url)
+    this.setState({genreList: results.data.data})
+  }
+  adminList = async () => {
+		this.setState({isLoading: true})
+		const {REACT_APP_URL} = process.env
+		const url = `${REACT_APP_URL}employes`
+		const results = await axios.get(url)
+    this.setState({adminList: results.data.data})
+  }
+  
 	async componentDidMount(){
     const data = await this.fetchData()
+    await this.genreList()
+    await this.adminList()
     this.setState({genreName: data.name})
-    console.log(this.state.data)
 	}
   render(){
     return(
@@ -205,10 +223,11 @@ class Detail extends Component {
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<select name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
-                    <option className="list-group-item bg-light" value={1}>Horror</option>
-                    <option className="list-group-item bg-light" value={2}>Comedy</option>
-                  </select> 
+									<Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
+                    {this.state.genreList.map((genre, index) =>(
+                    <option className="list-group-item bg-light" value={genre.id}>{genre.name}</option>
+                    ))}
+                  </Input> 
 									<h6>Image</h6>
 									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
 							</ModalBody>

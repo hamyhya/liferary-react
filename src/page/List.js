@@ -27,7 +27,8 @@ class List extends Component {
 			description: '',
 			genre: 0,
 			author: '',
-			image: ''
+			image: '',
+			genreList: []
 		}
 		this.toggleAddModal = this.toggleAddModal.bind(this)
 		this.addBook = this.addBook.bind(this)
@@ -84,9 +85,17 @@ class List extends Component {
 			this.props.history.push(`?${param}`)
 		}
 	}
+	genreList = async () => {
+		this.setState({isLoading: true})
+		const {REACT_APP_URL} = process.env
+		const url = `${REACT_APP_URL}genres`
+		const results = await axios.get(url)
+		this.setState({genreList: results.data.data})
+  }
 	async componentDidMount(){
 		const param = qs.parse(this.props.location.search.slice(1))
 		await this.fetchData(param)
+		await this.genreList()
 	}
 	
 
@@ -251,11 +260,15 @@ class List extends Component {
 									<h6>Title</h6>
 									<Input type='text' name='title' className='mb-2 shadow-none' onChange={this.handlerChange}/>
 									<h6>Description</h6>
-									<Input type='text' name='description' className='mb-3 shadow-none' onChange={this.handlerChange}/>
+									<Input type='textarea' name='description' className='mb-3 shadow-none' onChange={this.handlerChange}/>
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<Input type='text' name='genre' className='mb-3 shadow-none' onChange={this.handlerChange}/>
+									<Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange}>
+                    {this.state.genreList.map((genre, index) =>(
+                    <option className="list-group-item bg-light" value={genre.id}>{genre.name}</option>
+                    ))}
+                  </Input> 
 									<h6>Cover Image</h6>
 									<Input type='file' name='image' className='mb-2' onChange={(e) => this.setState({image: e.target.files[0]})}/>
 							</ModalBody>

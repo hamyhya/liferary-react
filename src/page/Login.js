@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import Logo from '../assets/smeatech.png'
+import swal from 'sweetalert2'
+import axios from 'axios'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
   BrowserRouter as Router,
@@ -13,18 +15,51 @@ class Login extends Component {
       email: '',
       password: ''
     }
+    this.loginUser = this.loginUser.bind(this)
+    // this.checkLogin = this.checkLogin.bind(this)
   }
 
-  login = (e) => {
-    e.preventDefault()
-    const data = {
-      userData: {
-        email: this.state.email,
-        password: this.state.password,
-      }
+  handlerChange = (e) =>{
+		this.setState({[e.target.name]: e.target.value})
+	}
+  async loginUser (event) {
+		event.preventDefault()
+		const {REACT_APP_URL} = process.env
+		const dataSubmit = {
+      email: this.state.email,
+      password: this.state.password
     }
-    this.props.history.push('/tes', data)
+
+		const url = `${REACT_APP_URL}users/login`
+		await axios.post(url, dataSubmit).then( (response) => {
+				console.log(response);
+          this.setState( () => {
+            localStorage.setItem('token', 'true')
+            this.props.history.push('/dashboard')
+          })
+        swal.fire({
+					icon: 'success',
+					title: 'Success',
+					text: 'Login successfully'
+				})
+			})
+			.catch(function (error) {
+				swal.fire({
+					icon: 'error',
+					title: 'Hmmm!',
+					text: "Data doesn't match our records"
+				})
+				console.log(error);
+			 })
   }
+  // checkLogin = () => {
+  //   if (localStorage.getItem('token')) {
+  //     this.props.history.push('/dashboard')
+  //   }
+  // }
+  // async componentDidMount(){
+  //   await this.checkLogin()
+	// }
 
   render(){
     return(
@@ -41,18 +76,18 @@ class Login extends Component {
                 <img className='p-3' src={Logo} alt='Logo' />
               </div>
               <div className='flex-grow-1 d-flex justify-content-center align-items-center'>
-                <Form className='login-form mb-5'>
+                <Form className='login-form mb-5' onSubmit={this.loginUser}>
                   <h1>Login</h1>
                   <p>Welcome Back, Please Login to your account! :)</p>
                   <div className='input-wrapper no-gutter'>
                     <FormGroup className='form-group'>
                       <Label className='w-100'>
-                        <Input type='email' placeholder='Email Adress'/>
+                        <Input type='email' name='email' onChange={this.handlerChange} placeholder='Email Adress'/>
                       </Label>
                     </FormGroup>
                     <FormGroup className='form-group'>
                       <Label className='w-100'>
-                        <Input type='password' placeholder='Password'/>
+                        <Input type='password' name='password' onChange={this.handlerChange} placeholder='Password'/>
                       </Label>
                     </FormGroup>
                     </div>
@@ -66,7 +101,7 @@ class Login extends Component {
                     <div><a href='#'><Link to='/admin'>Administrator</Link></a></div>
                   </div>
                   <div className='mt-4'>
-                    <Link className='btn right-btn' to='/dashboard'>Login</Link>
+                    <Button className='btn right-btn' type='submit'>Login</Button>
                     <Link className='btn left-btn ml-2' to='/register'>Sign Up</Link>
                   </div>
                   <div className='d-flex flex-column mt-5'>
