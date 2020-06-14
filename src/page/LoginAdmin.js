@@ -16,7 +16,7 @@ class LoginAdmin extends Component {
       password: ''
     }
     this.LoginAdmin = this.LoginAdmin.bind(this)
-    // this.checkLogin = this.checkLogin.bind(this)
+    this.checkLogin = this.checkLogin.bind(this)
   }
 
   handlerChange = (e) =>{
@@ -52,14 +52,14 @@ class LoginAdmin extends Component {
 				console.log(error);
 			 })
   }
-  // checkLogin = () => {
-  //   if (localStorage.getItem('token')) {
-  //     this.props.history.push('/dashboard')
-  //   }
-  // }
-  // async componentDidMount(){
-  //   await this.checkLogin()
-	// }
+  checkLogin = () => {
+    if (localStorage.getItem('token')) {
+      this.props.history.push('/dashboard')
+    }
+  }
+  async componentDidMount(){
+    await this.checkLogin()
+	}
 
   render(){
     return(

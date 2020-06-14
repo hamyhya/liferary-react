@@ -2,8 +2,23 @@ import React, {Component} from 'react'
 import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
-import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
-  ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
+import {Row, 
+  Col, 
+  Nav, 
+  Form, 
+  Button,
+  Modal, 
+  ModalBody, 
+  ModalHeader, 
+  Input, 
+  Table, 
+  ModalFooter, 
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  NavItem,
+  NavLink} from 'reactstrap'
 import {
   BrowserRouter as Router,
   Link
@@ -16,14 +31,29 @@ import card from '../assets/dilan-card.png'
 class Histories extends Component {
   constructor(props){
     super(props)
+    this.checkToken = () => {
+      if(!localStorage.getItem('token')){
+				props.history.push('/admin')
+				swal.fire({
+					icon: 'error',
+					title: 'Nooooo!',
+					text: 'You have to login first'
+				})
+      }
+    }
     this.state = {
       showAddModal: false,
+      showNavbar: false,
+      showLogoutModal: false,
       pageInfo: {},
       search: '',
       data: []
     }
     this.deleteHistory = this.deleteHistory.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
+		this.toggleNavbar = this.toggleNavbar.bind(this)
+		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
+		this.logoutAuth = this.logoutAuth.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
@@ -32,6 +62,29 @@ class Histories extends Component {
       showAddModal: !this.state.showAddModal
     })
   }
+  toggleNavbar(){
+		this.setState({
+			showNavbar: !this.state.showNavbar
+		})
+  }
+  toggleNavbar(){
+		this.setState({
+			showNavbar: !this.state.showNavbar
+		})
+  }
+  logoutAuth = () => {
+		this.setState({isLoading: true},()=>{
+				this.setState({isLoading: false}, ()=>{
+					localStorage.removeItem('token')
+						this.props.history.push('/')
+				})
+		})
+  }
+  toggleLogoutModal(){
+		this.setState({
+			showLogoutModal: !this.state.showLogoutModal
+		})
+	}
   toggleEditModal(){
     this.setState({
       showEditModal: !this.state.showEditModal
@@ -67,6 +120,7 @@ class Histories extends Component {
     }
   }
   async componentDidMount(){
+		this.checkToken()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
@@ -78,77 +132,55 @@ class Histories extends Component {
     params.sort = params.sort || 0
     return(
       <>
-        <Row className='w-100 h-100 no-gutters'>
-          <Col md={2} className='sidebar h-100 fixed-top'>
-            <div className='h-100 p-3'>
-              <div className='p-4 profile-img'>
-                <img className='' src={profile} />
-                <h5 className='pt-2'>Ilham Bagas</h5>
+        <Row className='d-flex flex-column w-100'>
+          <Col className='w-100'>
+            <Navbar className='nav-dashboard fixed-top' light expand="md">
+						  <Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+              <NavbarToggler onClick={this.toggleNavbar} />
+              <Collapse isOpen={this.state.showNavbar} navbar>
+                <Nav className="mr-auto" navbar>
+                  <NavItem>
+                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                  </NavItem>
+                </Nav>
+                  <span className="navbar-text">
+                    <Form className="form-inline">
+                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
+                      <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2" type='button'>Logout</Button>
+                    </Form>
+                  </span>
+                </Collapse>
+              </Navbar>
+          </Col>
+          <Col className='mt-5'>
+            <div className='d-flex justify-content-between container'>
+              <div className='mt-5'>
+                <h4>List Histories</h4>
               </div>
-              <div className='pt-5'>
-                <ul className className='sidebar-list'>
-                <li className='pt-2'><h5>
-                    <Link to='/dashboard'><a className='text-white' href=''>Dashboard</a></Link>  
-                  </h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/transactions'><a className='text-white' href=''>Transactions</a></Link>
-                  </h5></li>
-									<li className='pt-2'><h5>
-										<Link to='/histories'><a className='text-white' href=''>Histories</a></Link>
-									</h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/administrators'><a className='text-white' href=''>Administrators</a></Link>
-                  </h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/users'><a className='text-white' href=''>Users</a></Link>
-                  </h5></li>
-                </ul>
+              <div className='mt-5'>
+                <Button className='btn btn-danger' onClick={this.toggleDeleteModal}>Clear History</Button>
               </div>
             </div>
           </Col>
-          <Col md={10} className=''>
-            <Row>
-                <Col>
-                  <Nav className="navbar nav-dashboard navbar-expand-lg fixed-top">
-                    <a className="navbar-brand font-weight-bold text-white" href="#">
-                        Liferary
-                    </a>
-                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                      <span className="navbar-toggler-icon"></span>
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarText">
-                      <ul className="navbar-nav mr-auto">
-                        <li className="nav-item active">
-                          <a className="nav-link text-white" href="#">All Categories <span className="sr-only">(current)</span></a>
-                        </li>
-                        <li className="nav-item">
-                          <a className="nav-link text-white" href="#">All Time</a>
-                        </li>
-                      </ul>
-                      <span className="navbar-text">
-                      <Form className="form-inline">
-                        <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
-                        <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
-                      </Form>
-                      </span>
-                    </div>
-                  </Nav>
-                </Col>
-              </Row>
-            <Row className='w-100 list-book'>
-              <Col className='list-book-content'>
-                <Row className='d-flex justify-content-between'>
-                    <Col>
-                    <h4>Histories</h4>
-                    </Col>
-                    <Col className='d-flex justify-content-end'>
-                    <Button className='btn btn-danger' onClick={this.toggleDeleteModal}>Clear History</Button>
-                    </Col>
-                  </Row>
-                <Row className='mt-5'>
-                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>} &nbsp;|&nbsp;
-                {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}> Desc</Button>}
-                  <Table bordered className='mt-2'>
+          <Col className='mt-5'>
+            <div className='container'>
+              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
+              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+            </div>
+          </Col>
+          <Col className='mt-1'>
+            <div className='container'>
+            <Table bordered className='mt-2'>
                     <thead>
                       <tr>
                         <th>Id</th>
@@ -172,33 +204,33 @@ class Histories extends Component {
                       ))}
                     </tbody>
                   </Table>
-                </Row>
-                <Row className='mt-5 mb-5 container d-flex justify-content-center'>
-                  <Col md={12} className='d-flex justify-content-center'>
-                    <div className='pagination-btn d-flex flex-row justify-content-between'>
-                      <div>
-                        {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                        
-                      </div>
-                      <div>
-                        {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                          return (
-                          <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                          )
-                        })}
-                      </div>
-                      <div>
-                        <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-                      </div>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
+            </div>
           </Col>
-            <div className='footer w-100 d-flex justify-content-center align-items-center'>
+          <Col className='mt-5'>
+            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+              <div>
+                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                
+              </div>
+              <div>
+                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                  return (
+                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                  )
+                })}
+              </div>
+              <div>
+                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+              </div>
+            </div>
+          </Col>
+        </Row>
+        <Row className='w-100 '>
+          <Col className='mt-5 w-100'>
+            <div className='fixed-bottom footer d-flex justify-content-center align-items-center'>
               <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
             </div>
+          </Col>
         </Row>
 
          {/* Delete Modal */}
@@ -209,6 +241,15 @@ class Histories extends Component {
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
+
+          {/* Logout Modal */}
+				<Modal isOpen={this.state.showLogoutModal}>
+          <ModalBody className='h4'>Are you sure?</ModalBody>
+          <ModalFooter>
+            <Button color='danger' onClick={this.logoutAuth}>Logout</Button>
+            <Button color='secondary' onClick={this.toggleLogoutModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
       </>
     )
   }

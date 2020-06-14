@@ -87,8 +87,8 @@ html, body, #root {
 }
 .nav-dashboard {
   box-shadow: 2px 5px 5px rgba(0,0,0,0.5);
+  margin-left: 210px;
   background-color: #34325E;
-  color: white;
 }
 .btn-search {
   background-color: #34325E;
@@ -104,8 +104,10 @@ html, body, #root {
   background-color: #34325E;
 }
 .list-book {
+  margin-left: 210px;
 }
 .list-book-content {
+  padding: 100px;
 }
 .card-img {
   width: 235px;

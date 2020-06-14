@@ -21,21 +21,18 @@ import logo from '../assets/smeatech.png'
 import profile from '../assets/profile.png'
 import card from '../assets/dilan-card.png'
 
-class List extends Component {
+class ListUsers extends Component {
 	constructor(props){
 		super(props)
 		this.checkToken = () => {
       if(!localStorage.getItem('token')){
-				props.history.push('/admin')
+				props.history.push('/login')
 				swal.fire({
 					icon: 'error',
 					title: 'Nooooo!',
 					text: 'You have to login first'
 				})
-      } 
-      // else {
-      //   props.history.push('/home')
-      // }
+      }
     }
 		this.state = {
 			showAddModal: false,
@@ -52,9 +49,9 @@ class List extends Component {
 			userId: 0,
 			genreList: []
 		}
-		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleAddModal = this.toggleAddModal.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
+		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
 		this.addBook = this.addBook.bind(this)
 	}
@@ -158,18 +155,6 @@ class List extends Component {
 						<NavbarToggler onClick={this.toggleNavbar} />
 						<Collapse isOpen={this.state.showNavbar} navbar>
 							<Nav className="mr-auto" navbar>
-								<NavItem>
-									<Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
-								</NavItem>
-								<NavItem>
-									<Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
-								</NavItem>
-								<NavItem>
-									<Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
-								</NavItem>
-								<NavItem>
-									<Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
-								</NavItem>
 							</Nav>
 								<span className="navbar-text">
 									<Form className="form-inline">
@@ -228,7 +213,7 @@ class List extends Component {
 										<CardImg top width="100%" src={book.picture} alt="Card image cap" />
 										<CardBody>
 											<CardTitle><h4><Link to={{
-													pathname: `/detail/${book.id}`,
+													pathname: `/detail-user/${book.id}`,
 													state: {
 														id: `${book.id}`,
 														title: `${book.title}`,
@@ -302,17 +287,17 @@ class List extends Component {
 						</Form>
 				</Modal>
 
-				{/* Logout Modal */}
+				{/* Penalty Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>
-          <ModalBody className='h4'>Are you sure?</ModalBody>
-          <ModalFooter>
-            <Button color='danger' onClick={this.logoutAuth}>Logout</Button>
-            <Button color='secondary' onClick={this.toggleLogoutModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
+            <ModalBody className='h4'>Are you sure?</ModalBody>
+            <ModalFooter>
+              <Button color='danger' onClick={this.logoutAuth}>Logout</Button>
+              <Button color='secondary' onClick={this.toggleLogoutModal}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
 			</>
 		)
 	}
 }
 
-export default List
+export default ListUsers

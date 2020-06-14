@@ -2,8 +2,13 @@ import React, {Component} from 'react'
 import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
-import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
-  ModalHeader, ModalFooter, Input, Table} from 'reactstrap'
+import {Row, Col, Form, Button, Modal, ModalBody, 
+  ModalHeader, ModalFooter, Nav, Input, Table, Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  NavItem,
+  NavLink} from 'reactstrap'
 import {
   BrowserRouter as Router,
   Link
@@ -16,9 +21,21 @@ import card from '../assets/dilan-card.png'
 class AdministratorsDetail extends Component {
   constructor(props){
     super(props)
+    this.checkToken = () => {
+      if(!localStorage.getItem('token')){
+				props.history.push('/admin')
+				swal.fire({
+					icon: 'error',
+					title: 'Nooooo!',
+					text: 'You have to login first'
+				})
+      }
+    }
     this.state = {
       showAddModal: false,
       showSuccessModal: false,
+      showLogoutModal: false,
+			showNavbar: false,
       pageInfo: {},
       search: '',
       id: props.match.params.id,
@@ -29,6 +46,9 @@ class AdministratorsDetail extends Component {
     }
     this.handlerUpdate = this.handlerUpdate.bind(this)
     this.deleteAdmin = this.deleteAdmin.bind(this)
+		this.toggleNavbar = this.toggleNavbar.bind(this)
+		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
+		this.logoutAuth = this.logoutAuth.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
@@ -41,6 +61,24 @@ class AdministratorsDetail extends Component {
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
+  toggleNavbar(){
+		this.setState({
+			showNavbar: !this.state.showNavbar
+		})
+  }
+  logoutAuth = () => {
+		this.setState({isLoading: true},()=>{
+				this.setState({isLoading: false}, ()=>{
+					localStorage.removeItem('token')
+						this.props.history.push('/')
+				})
+		})
+  }
+  toggleLogoutModal(){
+		this.setState({
+			showLogoutModal: !this.state.showLogoutModal
+		})
+	}
   handlerUpdate = (event) => {
     event.preventDefault()
     this.setState({isLoading: true})
@@ -98,22 +136,8 @@ deleteAdmin(){
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
-    const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}employes?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
-    }
-  }
   async componentDidMount(){
-    const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.checkToken()
   }
 
   render(){
@@ -123,86 +147,68 @@ deleteAdmin(){
     params.sort = params.sort || 0
     return(
       <>
-        <Row className='w-100 h-100 no-gutters'>
-          <Col md={2} className='sidebar h-100 fixed-top'>
-            <div className='h-100 p-3'>
-              <div className='p-4 profile-img'>
-                <img className='' src={profile} />
-                <h5 className='pt-2'>Ilham Bagas</h5>
-              </div>
-              <div className='pt-5'>
-                <ul className className='sidebar-list'>
-                <li className='pt-2'><h5>
-                    <Link to='/dashboard'><a className='text-white' href=''>Dashboard</a></Link>  
-                  </h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/transactions'><a className='text-white' href=''>Transactions</a></Link>
-                  </h5></li>
-									<li className='pt-2'><h5>
-										<Link to='/histories'><a className='text-white' href=''>Histories</a></Link>
-									</h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/administrators'><a className='text-white' href=''>Administrators</a></Link>
-                  </h5></li>
-                  <li className='pt-2'><h5>
-                    <Link to='/users'><a className='text-white' href=''>Users</a></Link>
-                  </h5></li>
-                </ul>
+        <Row className='d-flex flex-column w-100'>
+          <Col className='w-100'>
+            <Navbar className='nav-dashboard fixed-top' light expand="md">
+						  <Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+              <NavbarToggler onClick={this.toggleNavbar} />
+              <Collapse isOpen={this.state.showNavbar} navbar>
+                <Nav className="mr-auto" navbar>
+                  <NavItem>
+                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                  </NavItem>
+                </Nav>
+                  <span className="navbar-text">
+                    <Form className="form-inline">
+                      <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2" type='button'>Logout</Button>
+                    </Form>
+                  </span>
+                </Collapse>
+              </Navbar>
+          </Col>
+          <Col className='mt-5'>
+            <div className='d-flex justify-content-between container'>
+              <div className='mt-5'>
+                <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> &gt; Detail</h4>
               </div>
             </div>
           </Col>
-          <Col md={10} className=''>
-            <Row>
-                <Col>
-                  <Nav className="navbar nav-dashboard navbar-expand-lg fixed-top">
-                    <a className="navbar-brand font-weight-bold text-white" href="#">
-                        Liferary
-                    </a>
-                    <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                      <span className="navbar-toggler-icon"></span>
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarText">
-                      <ul className="navbar-nav mr-auto">
-                        <li className="nav-item active">
-                          <a className="nav-link text-white" href="#">All Categories <span className="sr-only">(current)</span></a>
-                        </li>
-                        <li className="nav-item">
-                          <a className="nav-link text-white" href="#">All Time</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </Nav>
-                </Col>
-              </Row>
-            <Row className='w-100 list-book'>
-              <Col className='list-book-content'>
-                <div className='detail-wrapper'>
-                  <div>
-                  <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> > Detail</h4>
-                  </div>
-                  <Table bordered className='mt-5'>
-                      <tr>
-                        <td><h6>Name</h6></td>
-                        <td>{this.state.email}</td>
-                      </tr>
-                      <tr>
-                        <td><h6>Email</h6></td>
-                        <td>{this.state.email}</td>
-                      </tr>
-                  </Table>
-                  <div className='mt-4'>
-                    <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>
-                    <Button className='btn-danger ml-3' onClick={this.toggleDeleteModal}>Delete</Button>
-                  </div>
-                </div>
-              </Col>
-                <div className='footer w-100 d-flex justify-content-center align-items-center'>
-                  <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
-                </div>
-            </Row>
-            </Col>
+          <Col className='mt-1'>
+            <div className='container'>
+              <Table bordered className='mt-5'>
+                  <tr>
+                    <td><h6>Name</h6></td>
+                    <td>{this.state.name}</td>
+                  </tr>
+                  <tr>
+                    <td><h6>Email</h6></td>
+                    <td>{this.state.email}</td>
+                  </tr>
+              </Table>
+              <div className='mt-4'>
+                <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>
+                <Button className='btn-danger ml-3' onClick={this.toggleDeleteModal}>Delete</Button>
+              </div>
+            </div>
+          </Col>
         </Row>
-
+        <Row className='w-100 '>
+          <Col className='mt-5 w-100'>
+            <div className='fixed-bottom footer d-flex justify-content-center align-items-center'>
+              <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
+            </div>
+          </Col>
+        </Row>
+        
         {/* Add Modal */}
         <Modal isOpen={this.state.showAddModal}>
           <Form onSubmit={this.handlerUpdate}>
@@ -247,6 +253,15 @@ deleteAdmin(){
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
+
+          {/* Logout Modal */}
+				<Modal isOpen={this.state.showLogoutModal}>
+          <ModalBody className='h4'>Are you sure?</ModalBody>
+          <ModalFooter>
+            <Button color='danger' onClick={this.logoutAuth}>Logout</Button>
+            <Button color='secondary' onClick={this.toggleLogoutModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
       </>
     )
   }

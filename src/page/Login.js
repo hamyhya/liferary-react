@@ -16,7 +16,7 @@ class Login extends Component {
       password: ''
     }
     this.loginUser = this.loginUser.bind(this)
-    // this.checkLogin = this.checkLogin.bind(this)
+    this.checkLogin = this.checkLogin.bind(this)
   }
 
   handlerChange = (e) =>{
@@ -35,7 +35,7 @@ class Login extends Component {
 				console.log(response);
           this.setState( () => {
             localStorage.setItem('token', 'true')
-            this.props.history.push('/dashboard')
+            this.props.history.push('/dashboard-user')
           })
         swal.fire({
 					icon: 'success',
@@ -52,14 +52,14 @@ class Login extends Component {
 				console.log(error);
 			 })
   }
-  // checkLogin = () => {
-  //   if (localStorage.getItem('token')) {
-  //     this.props.history.push('/dashboard')
-  //   }
-  // }
-  // async componentDidMount(){
-  //   await this.checkLogin()
-	// }
+  checkLogin = () => {
+    if (localStorage.getItem('token')) {
+      this.props.history.push('/dashboard')
+    }
+  }
+  async componentDidMount(){
+    await this.checkLogin()
+	}
 
   render(){
     return(

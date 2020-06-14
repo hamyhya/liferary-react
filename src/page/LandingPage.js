@@ -62,7 +62,7 @@ class LandingPage extends Component {
                 <p>Love, Life, Library</p>
               </div>
               <div className='container mt-5'>
-                <Link><button className="btn btn-light my-2 my-sm-0 font-weight-bold" type="submit">Discover</button></Link>
+                <Link to='/dashboard-user'><button className="btn btn-light my-2 my-sm-0 font-weight-bold" type="submit">Discover</button></Link>
               </div>
             </div>
           </div>
@@ -87,17 +87,7 @@ class LandingPage extends Component {
                         </div>
                           <div className="card-body">
                             <h5 className="card-title">
-                              <Link to={{
-                              pathname: `/detail/${book.id}`,
-                              state: {
-                                id: `${book.id}`,
-                                title: `${book.title}`,
-                                description: `${book.description}`,
-                                genre: `${book.genre}`,
-                                author: `${book.genre}`,
-                                picture: `${book.picture}`
-                              }
-                            }}><a classNameName='text-black'>{book.title}</a>
+                              <Link to='/login'><a classNameName='text-black'>{book.title}</a>
                               </Link>
                             </h5>
                             <p className="card-text">{book.description}</p>

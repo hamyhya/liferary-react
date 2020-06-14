@@ -11,12 +11,12 @@ import {
 
 import dilanfull from '../assets/dilan-full.png'
 
-class Detail extends Component {
+class DetailUsers extends Component {
   constructor(props){
     super(props)
     this.checkToken = () => {
       if(!localStorage.getItem('token')){
-				props.history.push('/admin')
+				props.history.push('/login')
 				swal.fire({
 					icon: 'error',
 					title: 'Nooooo!',
@@ -183,11 +183,9 @@ class Detail extends Component {
           <div className="half-cover">
             <div className='w-100 cover-content d-flex justify-content-between p-4'>
               <div className='back'>
-                <Link to='/dashboard' className='btn back-btn btn-lg btn-light'>Back</Link>
+                <Link to='/dashboard-user' className='btn back-btn btn-lg btn-light'>Back</Link>
               </div>
               <div className='option-btn'>
-              <h3 className='text-white'><Link><a onClick={this.toggleEditModal}>Edit</a></Link> 
-              &nbsp;| <Link><a onClick={this.toggleDeleteModal}>Delete</a></Link></h3>
               </div>
             </div>
           </div>
@@ -212,7 +210,6 @@ class Detail extends Component {
               <p>{this.state.description}</p>
               </Col>
               <Col md={4} className="borrow align-self-end d-flex justify-content-end">
-                <button type='button' className='btn btn-lg btn-borrow m-5' onClick={this.toggleBorrowModal}>Borrow</button>
               </Col>
             </Row>
           </div>
@@ -221,70 +218,9 @@ class Detail extends Component {
           <h6 className='text-white'>Crafted with love by <a className='text-white' href='https://instagram.com/ilhambagasaputra'>Ilham Bagas Saputra</a></h6>
         </div>
 
-        {/* Edit Modal */}
-        <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Book</ModalHeader>
-          	<Form>
-							<ModalBody>
-									<h6>Title</h6>
-									<Input type='text' name='title' className='mb-2 shadow-none' value={this.state.title} onChange={this.handlerChange}/>
-									<h6>Description</h6>
-									<Input type='textarea' name='description' className='mb-3 shadow-none' value={this.state.description} onChange={this.handlerChange}/>
-									<h6>Author</h6>
-									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
-									<h6>Genre</h6>
-									<Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
-                    {this.state.genreList.map((genre, index) =>(
-                    <option className="list-group-item bg-light" value={genre.id}>{genre.name}</option>
-                    ))}
-                  </Input> 
-									<h6>Image</h6>
-									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
-							</ModalBody>
-							<ModalFooter>
-									<Button color="primary" onClick={this.updateBook}>Edit Book</Button>
-									<Button color="secondary" onClick={this.toggleEditModal}>Cancel</Button>
-							</ModalFooter>
-						</Form>
-        </Modal>
-
-         {/* Delete Modal */}
-         <Modal isOpen={this.state.showDeleteModal}>
-            <ModalBody className='h4'>Are you sure?</ModalBody>
-            <ModalFooter>
-              <Button color='danger' onClick={this.deleteBook}>Delete</Button>
-              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-
-          {/* Borrow Modal */}
-          <Modal isOpen={this.state.showBorrowModal}>
-            <ModalHeader className='h1'>Borrow Book</ModalHeader>
-            <ModalBody>
-              <h6>User ID</h6>
-              <Input name='user_id' onChange={this.handlerChange} type='text' className='mb-2'/>
-              <h6>Admin ID</h6>
-              <Input name='employee_id' onChange={this.handlerChange} type='text' className='mb-2'/>
-            </ModalBody>
-            <ModalFooter>
-              <Button color='primary' onClick={this.borrowBook}>Borrow</Button>
-              <Button color='secondary' onClick={this.toggleBorrowModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-
-          {/* Delete Succes Modal */}
-          <Modal isOpen={this.state.showSuccessModal}>
-            <ModalHeader className='h1'>Delete success</ModalHeader>
-            <ModalBody className='d-flex justify-content-center align-items-center'>
-                {/* <img className='centang' src={centang} alt='SuccessImage'/> */}
-            </ModalBody>
-            <ModalFooter>
-                <Button className='btn-success' onClick={this.home} >Home</Button>
-            </ModalFooter>
-          </Modal>
       </>
     )
   }
 }
 
-export default Detail
+export default DetailUsers
