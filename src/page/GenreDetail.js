@@ -14,10 +14,11 @@ import {
   Link
 } from "react-router-dom";
 
-class AdministratorsDetail extends Component {
+
+class GenreDetail extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
+    this.authCheck = () => {
       if(!localStorage.getItem('token')){
 				props.history.push('/admin')
 				swal.fire({
@@ -28,6 +29,7 @@ class AdministratorsDetail extends Component {
       }
     }
     this.state = {
+      showAddModal: false,
       showSuccessModal: false,
       showLogoutModal: false,
 			showNavbar: false,
@@ -40,10 +42,11 @@ class AdministratorsDetail extends Component {
       data: []
     }
     this.handlerUpdate = this.handlerUpdate.bind(this)
-    this.deleteAdmin = this.deleteAdmin.bind(this)
+    this.deleteGenre = this.deleteGenre.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
+    this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
@@ -84,7 +87,7 @@ class AdministratorsDetail extends Component {
     
     console.log(authorData)
     const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}employes/${this.state.id}`
+    const url = `${REACT_APP_URL}genres/${this.state.id}`
     axios.patch(url, authorData).then( (response) => {
         console.log(response)
       })
@@ -99,20 +102,20 @@ class AdministratorsDetail extends Component {
        swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'Yahaha! edit admin success'
+        text: 'Yahaha! edit genre success'
       })
-      this.props.history.push('/administrators')
+      this.props.history.push('/genres')
 }
-deleteAdmin(){
+deleteGenre(){
   const {REACT_APP_URL} = process.env
   console.log(this.state.id)
-  axios.delete(`${REACT_APP_URL}employes/${this.state.id}`)
+  axios.delete(`${REACT_APP_URL}genres/${this.state.id}`)
   this.setState({showDeleteModal: !this.state.showDeleteModal})
-  this.props.history.push('/administrators')
+  this.props.history.push('/genres')
   swal.fire({
     icon: 'success',
     title: 'Success',
-    text: 'Poof! delete admin success'
+    text: 'Poof! delete genre success'
   })
 }
   toggleAddModal(){
@@ -131,7 +134,7 @@ deleteAdmin(){
     })
   }
   async componentDidMount(){
-    this.checkToken()
+    this.authCheck()
   }
 
   render(){
@@ -175,7 +178,7 @@ deleteAdmin(){
           <Col className='mt-5'>
             <div className='d-flex justify-content-between container'>
               <div className='mt-5'>
-                <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> &gt; Detail</h4>
+                <h4><Link to='/genres'><a className='text-dark mb-5'>Genres</a></Link> &gt; Detail</h4>
               </div>
             </div>
           </Col>
@@ -183,12 +186,12 @@ deleteAdmin(){
             <div className='container'>
               <Table bordered className='mt-5'>
                   <tr>
-                    <td><h6>Name</h6></td>
-                    <td>{this.state.name}</td>
+                    <td><h6>Genre ID</h6></td>
+                    <td>{this.state.id}</td>
                   </tr>
                   <tr>
-                    <td><h6>Email</h6></td>
-                    <td>{this.state.email}</td>
+                    <td><h6>Name</h6></td>
+                    <td>{this.state.name}</td>
                   </tr>
               </Table>
               <div className='mt-4'>
@@ -208,14 +211,11 @@ deleteAdmin(){
         
          {/* Edit Modal */}
          <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Admin</ModalHeader>
+          <ModalHeader className='h1'>Edit Genre</ModalHeader>
           <ModalBody>
             <h6>Name</h6>
             <Input name='name' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.name}/>
             <h6>Email</h6>
-            <Input name='email' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.email}/>
-            <h6>Password</h6>
-            <Input name='password' type='password' className='mb-2' onChange={this.handlerChange} value={this.state.password}/>
           </ModalBody>
           <ModalFooter>
             <Button color='primary' onClick={this.handlerUpdate}>Edit</Button>
@@ -227,7 +227,7 @@ deleteAdmin(){
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick={this.deleteAdmin}>Delete</Button>
+              <Button color='danger' onClick={this.deleteGenre}>Delete</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -245,4 +245,4 @@ deleteAdmin(){
   }
 }
 
-export default AdministratorsDetail
+export default GenreDetail

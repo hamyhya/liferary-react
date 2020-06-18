@@ -24,10 +24,6 @@ import {
   Link
 } from "react-router-dom";
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
-
 class TransactionDetail extends Component {
   constructor(props){
     super(props)
@@ -44,6 +40,7 @@ class TransactionDetail extends Component {
     this.state = {
       showAddModal: false,
       showPenaltyModal: false,
+      showAccModal: false,
       showLogoutModal: false,
       showNavbar: false,
       showSuccessModal: false,
@@ -57,7 +54,8 @@ class TransactionDetail extends Component {
       created_at: props.location.state.created_at,
       data: []
     }
-    this.updateTransaction = this.updateTransaction.bind(this)
+    this.setPenalty = this.setPenalty.bind(this)
+    this.setAcc = this.setAcc.bind(this)
     this.addHistory = this.addHistory.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
     this.deleteTransaction = this.deleteTransaction.bind(this)
@@ -65,6 +63,7 @@ class TransactionDetail extends Component {
 		this.logoutAuth = this.logoutAuth.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
     this.togglePenaltyModal = this.togglePenaltyModal.bind(this)
+    this.toggleAccModal = this.toggleAccModal.bind(this)
   }
   home = (e) =>{
     e.preventDefault()
@@ -128,10 +127,27 @@ class TransactionDetail extends Component {
       text: 'Okay! Book returned'
     })
   }
-  updateTransaction(){
+  setAcc(){
     const {REACT_APP_URL} = process.env
     console.log(this.state.id)
-    axios.patch(`${REACT_APP_URL}transactions/${this.state.id}`)
+		const token = JSON.parse(localStorage.getItem('token'))
+    const transactionData = {
+      employee_id: token.id
+    }
+    const url = `${REACT_APP_URL}transactions/acc/${this.state.id}`
+    axios.patch(url, transactionData)
+    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.props.history.push('/transactions')
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Okay! Transaction Accepted'
+    })
+  }
+  setPenalty(){
+    const {REACT_APP_URL} = process.env
+    console.log(this.state.id)
+    axios.patch(`${REACT_APP_URL}transactions/penalty/${this.state.id}`)
     this.setState({showDeleteModal: !this.state.showDeleteModal})
     this.props.history.push('/transactions')
     swal.fire({
@@ -148,6 +164,11 @@ class TransactionDetail extends Component {
   togglePenaltyModal(){
     this.setState({
       showPenaltyModal: !this.state.showPenaltyModal
+    })
+  }
+  toggleAccModal(){
+    this.setState({
+      showAccModal: !this.state.showAccModal
     })
   }
   async componentDidMount(){
@@ -179,6 +200,9 @@ class TransactionDetail extends Component {
                   </NavItem>
                   <NavItem>
                     <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">
@@ -221,8 +245,9 @@ class TransactionDetail extends Component {
                 </tr>
               </Table>
               <div className='mt-4'>
-                <Button className='btn-danger' onClick={this.togglePenaltyModal}>Set Penalty</Button>
-                <Button className='btn-success ml-3' onClick={this.toggleDeleteModal}>Return This Book</Button>
+                <Button className='btn-success' onClick={this.toggleAccModal}>Accept</Button>
+                <Button className='btn-danger ml-3' onClick={this.togglePenaltyModal}>Set Penalty</Button>
+                <Button className='btn-primary ml-3' onClick={this.toggleDeleteModal}>Return This Book</Button>
               </div>
             </div>
           </Col>
@@ -284,7 +309,16 @@ class TransactionDetail extends Component {
          <Modal isOpen={this.state.showPenaltyModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick={this.updateTransaction}>Penalty</Button>
+              <Button color='danger' onClick={this.setAcc}>Penalty</Button>
+              <Button color='secondary' onClick={this.togglePenaltyModal}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
+
+           {/* Acc Modal */}
+         <Modal isOpen={this.state.showAccModal}>
+            <ModalBody className='h4'>Are you sure?</ModalBody>
+            <ModalFooter>
+              <Button color='success' onClick={this.setAcc}>Accept</Button>
               <Button color='secondary' onClick={this.togglePenaltyModal}>Cancel</Button>
             </ModalFooter>
           </Modal>

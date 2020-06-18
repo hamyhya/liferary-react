@@ -2,6 +2,7 @@ import React, {Component, useState} from 'react'
 import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
+import Token from '../services/Token'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
 	ModalHeader, ModalFooter, Input, Collapse,
   Navbar,
@@ -9,21 +10,19 @@ import {Row, Col, Nav, Form, Button, Modal, ModalBody,
   NavbarBrand,
   NavItem,
   NavLink,Card, CardImg, CardTitle, CardText, CardDeck,
-  CardSubtitle, CardBody} from 'reactstrap'
-import { Carousel, Jumbotron } from 'react-bootstrap'
-
+	CardSubtitle, CardBody} from 'reactstrap'
+import Select from 'react-select'
+import { Carousel, Jumbotron, Dropdown } from 'react-bootstrap'
 import {
 	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
 
 class List extends Component {
 	constructor(props){
 		super(props)
+		const token = JSON.parse(localStorage.getItem('token'))
 		this.checkToken = () => {
       if(!localStorage.getItem('token')){
 				props.history.push('/admin')
@@ -57,9 +56,13 @@ class List extends Component {
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
 		this.addBook = this.addBook.bind(this)
+		this.genreChange = this.genreChange.bind(this)
 	}
 	handlerChange = (e) =>{
 		this.setState({[e.target.name]: e.target.value})
+	}
+	genreChange = (e) =>{
+		this.setState({genre: e.value})
 	}
 	toggleAddModal(){
 		this.setState({
@@ -95,7 +98,7 @@ class List extends Component {
 		dataSubmit.set('author', this.state.author)
 
 		const url = `${REACT_APP_URL}books`
-		await axios.post(url, dataSubmit).then( (response) => {
+		await axios.post(url, dataSubmit, {headers: Token()}).then( (response) => {
 				console.log(response);
 				this.setState({showAddModal: false})
 				this.fetchData()
@@ -170,6 +173,9 @@ class List extends Component {
 								<NavItem>
 									<Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
 								</NavItem>
+                <NavItem>
+                  <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                </NavItem>
 							</Nav>
 								<span className="navbar-text">
 									<Form className="form-inline">
@@ -214,11 +220,18 @@ class List extends Component {
 				</Col>
 				<Col className='mt-5'>
 					<div className='container'>
-						{<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-						{<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+						<Dropdown className="mb-4 ml-2">
+              <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                Sort By
+              </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                    <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
 					</div>
 				</Col>
-				<Col className='mt-1'>
+				<Col>
 					<div className='container'>
 						<Row>
 							<CardDeck>
@@ -287,12 +300,19 @@ class List extends Component {
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
+									 {/* <Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} 
+									 value={this.state.genre}>
                     {this.state.genreList.map((genre, index) =>(
                     <option className="list-group-item bg-light" value={genre.id}>{genre.name}</option>
                     ))}
-                  </Input> 
-									<h6>Cover Image</h6>
+                  </Input>  */}
+									{/* REACT-SELECT */}
+									<Select onChange={this.genreChange} options={
+										this.state.genreList.map((genre) =>(
+											{ value: genre.id, label: genre.name}
+											))
+									}/> 
+									<h6>Cover Image (JPG, PNG Maks. 1 Mb)</h6>
 									<Input type='file' name='image' className='mb-2' onChange={(e) => this.setState({image: e.target.files[0]})}/>
 							</ModalBody>
 							<ModalFooter>

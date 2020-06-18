@@ -25,7 +25,8 @@ import {
   Link
 } from "react-router-dom";
 
-class Users extends Component {
+
+class HistoriesUser extends Component {
   constructor(props){
     super(props)
     this.checkToken = () => {
@@ -40,23 +41,22 @@ class Users extends Component {
     }
     this.state = {
       showAddModal: false,
-      showLogoutModal: false,
       showNavbar: false,
+      showLogoutModal: false,
       pageInfo: {},
       search: '',
       data: []
     }
-    this.toggleAddModal = this.toggleAddModal.bind(this)
-    this.toggleEditModal = this.toggleEditModal.bind(this)
+    this.deleteHistory = this.deleteHistory.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
-  toggleAddModal(){
-    this.setState({
-      showAddModal: !this.state.showAddModal
-    })
+  toggleNavbar(){
+		this.setState({
+			showNavbar: !this.state.showNavbar
+		})
   }
   toggleNavbar(){
 		this.setState({
@@ -76,22 +76,32 @@ class Users extends Component {
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
-  toggleEditModal(){
-    this.setState({
-      showEditModal: !this.state.showEditModal
-    })
-  }
   toggleDeleteModal(){
     this.setState({
       showDeleteModal: !this.state.showDeleteModal
+    })
+  }
+  deleteHistory(){
+    const {REACT_APP_URL} = process.env
+    axios.delete(`${REACT_APP_URL}histories`)
+    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.props.history.push('/dashboard')
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Cling! History cleared'
     })
   }
   fetchData = async (params) => {
     this.setState({isLoading: true})
     const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}users?${param}`
-    const results = await axios.get(url)
+		const token = JSON.parse(localStorage.getItem('token'))
+    const historiesData = {
+      user: token.name
+    }
+    const url = `${REACT_APP_URL}histories/user?${param}`
+    const results = await axios.post(url, historiesData)
     const {data} = results.data
     const pageInfo = results.data.pageInfo
     this.setState({data, pageInfo, isLoading: false})
@@ -115,24 +125,12 @@ class Users extends Component {
         <Row className='d-flex flex-column w-100'>
           <Col className='w-100'>
             <Navbar className='nav-dashboard fixed-top' light expand="md">
-						  <Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						  <Link to='/dashboard-user'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
               <NavbarToggler onClick={this.toggleNavbar} />
               <Collapse isOpen={this.state.showNavbar} navbar>
                 <Nav className="mr-auto" navbar>
                   <NavItem>
-                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
-                  </NavItem>
-                  <NavItem>
-                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
-                  </NavItem>
-                  <NavItem>
-                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
-                  </NavItem>
-                  <NavItem>
-                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
-                  </NavItem>
-                  <NavItem>
-                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                    <Link to='/histories-user'><NavLink className='text-white'>My Histories</NavLink></Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">
@@ -148,7 +146,7 @@ class Users extends Component {
           <Col className='mt-5'>
             <div className='d-flex justify-content-between container'>
               <div className='mt-5'>
-                <h4>List Users  </h4>
+                <h4>My Histories</h4>
               </div>
             </div>
           </Col>
@@ -167,39 +165,30 @@ class Users extends Component {
           </Col>
           <Col className='mt-1'>
             <div className='container'>
-              <Table bordered className='mt-2'>
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.data.map((user, index) => (
-                  <tr>
-                    <th scope="row">{user.id}</th>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.created_at}</td>
-                    <td>
-                    <h6>
-                      <Link to={{
-                          pathname: `/users-detail/${user.id}`,
-                          state: {
-                            id: `${user.id}`,
-                            name: `${user.name}`,
-                            email: `${user.email}`,
-                            created_at: `${user.created_at}`
-                          }
-                        }}><a>More...</a></Link></h6>
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </Table>
+            <Table bordered className='mt-2'>
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Transaction ID</th>
+                        <th>Title</th>
+                        <th>User</th>
+                        <th>Employee</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {this.state.data.map((history, index) => (
+                      <tr>
+                        <th scope="row">{history.id}</th>
+                        <td>{history.transaction_id}</td>
+                        <td>{history.title}</td>
+                        <td>{history.user}</td>
+                        <td>{history.employee}</td>
+                        <td>{history.date}</td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
             </div>
           </Col>
           <Col className='mt-5'>
@@ -229,54 +218,16 @@ class Users extends Component {
           </Col>
         </Row>
 
-        {/* Add Modal */}
-        <Modal isOpen={this.state.showAddModal}>
-          <ModalHeader className='h1'>Add Book</ModalHeader>
-          <ModalBody>
-            <h6>Title</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Description</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Image URL</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Author</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Genre</h6>
-            <Input type='text' className='mb-2'/>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Add</Button>
-            <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
-        {/* Edit Modal */}
-        <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Transaction</ModalHeader>
-          <ModalBody>
-            <h6>Status</h6>
-            <Input type="select" name="select" id="exampleSelect">
-              <option>Returned</option>
-              <option>Pending</option>
-              <option>Penalty</option>
-            </Input>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
          {/* Delete Modal */}
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick=''>Delete</Button>
+              <Button color='danger' onClick={this.deleteHistory}>Clear History</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
 
-           {/* Logout Modal */}
+          {/* Logout Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>
           <ModalBody className='h4'>Are you sure?</ModalBody>
           <ModalFooter>
@@ -289,4 +240,4 @@ class Users extends Component {
   }
 }
 
-export default Users
+export default HistoriesUser

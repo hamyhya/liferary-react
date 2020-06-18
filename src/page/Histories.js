@@ -19,14 +19,12 @@ import {Row,
   NavbarBrand,
   NavItem,
   NavLink} from 'reactstrap'
+import {Dropdown} from 'react-bootstrap'
 import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
 
 class Histories extends Component {
   constructor(props){
@@ -50,17 +48,10 @@ class Histories extends Component {
       data: []
     }
     this.deleteHistory = this.deleteHistory.bind(this)
-    this.toggleAddModal = this.toggleAddModal.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-    this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
-  }
-  toggleAddModal(){
-    this.setState({
-      showAddModal: !this.state.showAddModal
-    })
   }
   toggleNavbar(){
 		this.setState({
@@ -85,11 +76,6 @@ class Histories extends Component {
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
-  toggleEditModal(){
-    this.setState({
-      showEditModal: !this.state.showEditModal
-    })
-  }
   toggleDeleteModal(){
     this.setState({
       showDeleteModal: !this.state.showDeleteModal
@@ -151,6 +137,9 @@ class Histories extends Component {
                   <NavItem>
                     <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
                   </NavItem>
+                  <NavItem>
+                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                  </NavItem>
                 </Nav>
                   <span className="navbar-text">
                     <Form className="form-inline">
@@ -174,8 +163,15 @@ class Histories extends Component {
           </Col>
           <Col className='mt-5'>
             <div className='container'>
-              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+              <Dropdown className="mb-4 ml-2">
+                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                  Sort By
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
           </Col>
           <Col className='mt-1'>
@@ -183,7 +179,7 @@ class Histories extends Component {
             <Table bordered className='mt-2'>
                     <thead>
                       <tr>
-                        <th>Id</th>
+                        <th>No</th>
                         <th>Transaction ID</th>
                         <th>Title</th>
                         <th>User</th>

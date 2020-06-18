@@ -7,17 +7,20 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
-import card from '../assets/dilan-card.png'
 
 class LandingPage extends Component {
   constructor(props){
     super(props)
     this.state = {
       data: [],
+      search: '',
       pageInfo: {},
       isLoading: false
     }
   }
+  handlerChange = (e) =>{
+		this.setState({[e.target.name]: e.target.value})
+	}
   fetchData = async (params) => {
     this.setState({isLoading: true})
     const {REACT_APP_URL} = process.env
@@ -39,8 +42,8 @@ class LandingPage extends Component {
   render(){
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
-    params.sort = 0
-    params.search = ''
+    params.sort = params.sort || 0
+    params.search = params.search || ''
     return(
       <>
         <div className='landing-page'>
@@ -70,8 +73,8 @@ class LandingPage extends Component {
             <h1 className='d-flex justify-content-center'>Checkout Our Collections!</h1>
             <div className='d-flex justify-content-center mt-4'>
               <Form className="form-inline d-flex justify-content-center col-md-7">
-                <input className="find-book form-control col-md-6" type="search" placeholder="Find some books ..." aria-label="Search" />
-                <button className="btn btn-go ml-3" id='content' type="submit">Go!</button>
+                <Input onChange={e => this.setState({search: e.target.value})} className="find-book form-control col-md-6" type="search" placeholder="Find some books ..." aria-label="Search" />
+                <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn btn-go ml-3" id='content' type="button">Go!</Button>
               </Form>
             </div>
             <div className='d-flex justify-content-center'>

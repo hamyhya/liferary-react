@@ -20,6 +20,9 @@ import UserDetail from './page/UserDetail'
 import Histories from './page/Histories'
 import ListUsers from './page/ListUsers'
 import DetailUsers from './page/DetailUsers'
+import Genres from './page/Genres'
+import GenreDetail from './page/GenreDetail'
+import HistoriesUser from './page/HistoriesUser'
 
 class App extends Component {
   render(){
@@ -42,6 +45,9 @@ class App extends Component {
             <Route path='/users' component={Users} />
             <Route path='/users-detail/:id' component={UserDetail} />
             <Route path='/histories' component={Histories} />
+            <Route path='/histories-user' component={HistoriesUser} />
+            <Route path='/genres' component={Genres} />
+            <Route path='/genres-detail/:id' component={GenreDetail} />
           </Switch>
         </BrowserRouter>
       </>

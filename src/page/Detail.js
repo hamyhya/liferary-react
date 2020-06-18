@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import qs from 'querystring'
+import Select from 'react-select'
 import swal from 'sweetalert2'
 import {Col, Row, Button, Modal, ModalHeader, 
   ModalBody, ModalFooter, Input, Form} from 'reactstrap'
@@ -9,12 +10,10 @@ import {
   Link
 } from "react-router-dom";
 
-import dilanfull from '../assets/dilan-full.png'
-
 class Detail extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
+    this.authCheck = () => {
       if(!localStorage.getItem('token')){
 				props.history.push('/admin')
 				swal.fire({
@@ -46,6 +45,7 @@ class Detail extends Component {
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
     this.toggleBorrowModal = this.toggleBorrowModal.bind(this)
+    this.genreChange = this.genreChange.bind(this)
   }
   home = (e) =>{
     e.preventDefault()
@@ -54,6 +54,9 @@ class Detail extends Component {
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
+  }
+  genreChange = (e) => {
+    this.setState({ genre : e.value })
   }
   borrowBook = (event) => {
     event.preventDefault()
@@ -170,7 +173,7 @@ class Detail extends Component {
   }
   
 	async componentDidMount(){
-		this.checkToken()
+		this.authCheck()
     const data = await this.fetchData()
     await this.genreList()
     await this.adminList()
@@ -211,9 +214,6 @@ class Detail extends Component {
               <Col md={8}>
               <p>{this.state.description}</p>
               </Col>
-              <Col md={4} className="borrow align-self-end d-flex justify-content-end">
-                <button type='button' className='btn btn-lg btn-borrow m-5' onClick={this.toggleBorrowModal}>Borrow</button>
-              </Col>
             </Row>
           </div>
         </div>
@@ -233,11 +233,16 @@ class Detail extends Component {
 									<h6>Author</h6>
 									<Input type='text' name='author' className='mb-3 shadow-none' value={this.state.author} onChange={this.handlerChange}/>
 									<h6>Genre</h6>
-									<Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
+									{/* <Input type='select' name='genre' className="mb-3 shadow-none" onChange={this.handlerChange} value={this.state.genre}>
                     {this.state.genreList.map((genre, index) =>(
                     <option className="list-group-item bg-light" value={genre.id}>{genre.name}</option>
                     ))}
-                  </Input> 
+                  </Input>  */}
+                  <Select onChange={this.genreChange} options={
+                    this.state.genreList.map((genre) =>(
+                      { value: genre.id, label: genre.name}
+                      ))
+                  } value={this.state.genre}/>
 									<h6>Image</h6>
 									<Input type='file' name='picture' className='mb-2' onChange={(e) => this.setState({picture: e.target.files[0]})}/>
 							</ModalBody>
@@ -254,32 +259,6 @@ class Detail extends Component {
             <ModalFooter>
               <Button color='danger' onClick={this.deleteBook}>Delete</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-
-          {/* Borrow Modal */}
-          <Modal isOpen={this.state.showBorrowModal}>
-            <ModalHeader className='h1'>Borrow Book</ModalHeader>
-            <ModalBody>
-              <h6>User ID</h6>
-              <Input name='user_id' onChange={this.handlerChange} type='text' className='mb-2'/>
-              <h6>Admin ID</h6>
-              <Input name='employee_id' onChange={this.handlerChange} type='text' className='mb-2'/>
-            </ModalBody>
-            <ModalFooter>
-              <Button color='primary' onClick={this.borrowBook}>Borrow</Button>
-              <Button color='secondary' onClick={this.toggleBorrowModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-
-          {/* Delete Succes Modal */}
-          <Modal isOpen={this.state.showSuccessModal}>
-            <ModalHeader className='h1'>Delete success</ModalHeader>
-            <ModalBody className='d-flex justify-content-center align-items-center'>
-                {/* <img className='centang' src={centang} alt='SuccessImage'/> */}
-            </ModalBody>
-            <ModalFooter>
-                <Button className='btn-success' onClick={this.home} >Home</Button>
             </ModalFooter>
           </Modal>
       </>

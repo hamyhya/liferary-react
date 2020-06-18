@@ -9,12 +9,11 @@ import {
   Link
 } from "react-router-dom";
 
-import dilanfull from '../assets/dilan-full.png'
 
 class DetailUsers extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
+    this.authCheck = () => {
       if(!localStorage.getItem('token')){
 				props.history.push('/login')
 				swal.fire({
@@ -25,9 +24,6 @@ class DetailUsers extends Component {
       }
     }
     this.state = {
-      showEditModal: false,
-      showDeleteModal: false,
-      showSuccessModal: false,
       id: props.match.params.id,
       title: props.location.state.title,
       description: props.location.state.description,
@@ -40,11 +36,8 @@ class DetailUsers extends Component {
       genreList: [],
       adminList: []
     }
-    this.deleteBook = this.deleteBook.bind(this)
     this.updateBook = this.updateBook.bind(this)
     this.borrowBook = this.borrowBook.bind(this)
-    this.toggleEditModal = this.toggleEditModal.bind(this)
-    this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
     this.toggleBorrowModal = this.toggleBorrowModal.bind(this)
   }
   home = (e) =>{
@@ -58,10 +51,11 @@ class DetailUsers extends Component {
   borrowBook = (event) => {
     event.preventDefault()
     this.setState({isLoading: true})
+		const token = JSON.parse(localStorage.getItem('token'))
     const authorData = {
         book_id: this.state.id,
-        user_id: this.state.user_id,
-        employee_id: this.state.employee_id
+        user_id: token.id,
+        employee_id: 7
     }
     
     console.log(authorData)
@@ -73,7 +67,7 @@ class DetailUsers extends Component {
         swal.fire({
          icon: 'success',
          title: 'Success',
-         text: 'Yay! borrow book success'
+         text: 'Contact employee to complete transaction'
        })
       })
       .catch(function (error) {
@@ -84,7 +78,7 @@ class DetailUsers extends Component {
 					text: "Book has been booked right now"
 				})
        })
-       this.props.history.push('/dashboard')
+       this.props.history.push('/dashboard-user')
   }
   toggleEditModal(){
     this.setState({
@@ -170,7 +164,7 @@ class DetailUsers extends Component {
   }
   
 	async componentDidMount(){
-		this.checkToken()
+		this.authCheck()
     const data = await this.fetchData()
     await this.genreList()
     await this.adminList()
@@ -208,6 +202,9 @@ class DetailUsers extends Component {
             <Row className="desc d-flex mt-4 mb-5">
               <Col md={8}>
               <p>{this.state.description}</p>
+              </Col>
+              <Col md={4} className="borrow align-self-end d-flex justify-content-end">
+                <button type='button' className='btn btn-lg btn-borrow m-5' onClick={this.borrowBook}>Borrow</button>
               </Col>
               <Col md={4} className="borrow align-self-end d-flex justify-content-end">
               </Col>

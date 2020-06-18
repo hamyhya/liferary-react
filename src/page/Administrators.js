@@ -19,19 +19,17 @@ import {Row,
   NavbarBrand,
   NavItem,
   NavLink} from 'reactstrap'
+import {Dropdown} from 'react-bootstrap'
 import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
 
 class Administrators extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
+    this.authCheck = () => {
       if(!localStorage.getItem('token')){
 				props.history.push('/admin')
 				swal.fire({
@@ -57,8 +55,6 @@ class Administrators extends Component {
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-    this.toggleEditModal = this.toggleEditModal.bind(this)
-    this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
@@ -109,7 +105,7 @@ class Administrators extends Component {
         title: 'Success',
         text: 'Yay! add admin success'
       })
-       this.props.history.push('/dashboards')
+       this.props.history.push('/dashboard')
 }
   toggleAddModal(){
     this.setState({
@@ -140,7 +136,7 @@ class Administrators extends Component {
     }
   }
   async componentDidMount(){
-		this.checkToken()
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
@@ -171,6 +167,9 @@ class Administrators extends Component {
                   <NavItem>
                     <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
                   </NavItem>
+                  <NavItem>
+                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                  </NavItem>
                 </Nav>
                   <span className="navbar-text">
                     <Form className="form-inline">
@@ -194,8 +193,15 @@ class Administrators extends Component {
           </Col>
           <Col className='mt-5'>
             <div className='container'>
-              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-              {<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+              <Dropdown className="mb-4 ml-2">
+                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                  Sort By
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
           </Col>
           <Col className='mt-1'>
@@ -277,30 +283,6 @@ class Administrators extends Component {
           </ModalFooter>
           </Form>
         </Modal>
-        
-         {/* Edit Modal */}
-         <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Admin</ModalHeader>
-          <ModalBody>
-            <h6>Name</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Email</h6>
-            <Input type='text' className='mb-2'/>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
-         {/* Delete Modal */}
-         <Modal isOpen={this.state.showDeleteModal}>
-            <ModalBody className='h4'>Are you sure?</ModalBody>
-            <ModalFooter>
-              <Button color='danger' onClick=''>Delete</Button>
-              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
 
           {/* Logout Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>

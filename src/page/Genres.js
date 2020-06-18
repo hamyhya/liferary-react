@@ -1,20 +1,32 @@
-import React, {Component} from 'react'
+import React, {Component, useState} from 'react'
 import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
-import {Row, Col, Form, Button, Modal, ModalBody, 
-  ModalHeader, ModalFooter, Nav, Input, Table, Collapse,
+import {Row, 
+  Col, 
+  Nav, 
+  Form, 
+  Button,
+  Modal, 
+  ModalBody, 
+  ModalHeader, 
+  Input, 
+  Table, 
+  ModalFooter, 
+  Collapse,
   Navbar,
   NavbarToggler,
   NavbarBrand,
   NavItem,
   NavLink} from 'reactstrap'
+import {Dropdown} from 'react-bootstrap'
 import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
 
-class AdministratorsDetail extends Component {
+
+class Genres extends Component {
   constructor(props){
     super(props)
     this.checkToken = () => {
@@ -28,29 +40,20 @@ class AdministratorsDetail extends Component {
       }
     }
     this.state = {
-      showSuccessModal: false,
+      showNavbar: false,
       showLogoutModal: false,
-			showNavbar: false,
       pageInfo: {},
       search: '',
-      id: props.match.params.id,
-      name: props.location.state.name,
-      email: props.location.state.email,
-      password: props.location.state.password,
+      name: '',
+      email: '',
+      password: '',
       data: []
     }
-    this.handlerUpdate = this.handlerUpdate.bind(this)
-    this.deleteAdmin = this.deleteAdmin.bind(this)
+    this.handlerSubmit = this.handlerSubmit.bind(this)
+    this.toggleAddModal = this.toggleAddModal.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-    this.toggleEditModal = this.toggleEditModal.bind(this)
-    this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
-  }
-  home = (e) =>{
-    e.preventDefault()
-    
-    this.props.history.push('/administrators')
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
@@ -73,19 +76,17 @@ class AdministratorsDetail extends Component {
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
-  handlerUpdate = (event) => {
+  handlerSubmit = (event) => {
     event.preventDefault()
     this.setState({isLoading: true})
     const authorData = {
         name: this.state.name,
-        email: this.state.email,
-        password: this.state.password
     }
     
     console.log(authorData)
     const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}employes/${this.state.id}`
-    axios.patch(url, authorData).then( (response) => {
+    const url = `${REACT_APP_URL}genres`
+    axios.post(url, authorData).then( (response) => {
         console.log(response)
       })
       .catch(function (error) {
@@ -99,39 +100,32 @@ class AdministratorsDetail extends Component {
        swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'Yahaha! edit admin success'
+        text: 'Yay! add genre success'
       })
-      this.props.history.push('/administrators')
-}
-deleteAdmin(){
-  const {REACT_APP_URL} = process.env
-  console.log(this.state.id)
-  axios.delete(`${REACT_APP_URL}employes/${this.state.id}`)
-  this.setState({showDeleteModal: !this.state.showDeleteModal})
-  this.props.history.push('/administrators')
-  swal.fire({
-    icon: 'success',
-    title: 'Success',
-    text: 'Poof! delete admin success'
-  })
-}
-  toggleAddModal(){
-    this.setState({
-      showAddModal: !this.state.showAddModal
-    })
-  }
-  toggleEditModal(){
-    this.setState({
-      showEditModal: !this.state.showEditModal
-    })
+       this.props.history.push('/dashboard')
   }
   toggleDeleteModal(){
     this.setState({
       showDeleteModal: !this.state.showDeleteModal
     })
   }
+  fetchData = async (params) => {
+    this.setState({isLoading: true})
+    const {REACT_APP_URL} = process.env
+    const param = `${qs.stringify(params)}`
+    const url = `${REACT_APP_URL}genres?${param}`
+    const results = await axios.get(url)
+    const {data} = results.data
+    const pageInfo = results.data.pageInfo
+    this.setState({data, pageInfo, isLoading: false})
+    if(params){
+      this.props.history.push(`?${param}`)
+    }
+  }
   async componentDidMount(){
-    this.checkToken()
+		this.checkToken()
+    const param = qs.parse(this.props.location.search.slice(1))
+    await this.fetchData(param)
   }
 
   render(){
@@ -166,6 +160,8 @@ deleteAdmin(){
                 </Nav>
                   <span className="navbar-text">
                     <Form className="form-inline">
+                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
                       <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2" type='button'>Logout</Button>
                     </Form>
                   </span>
@@ -175,25 +171,71 @@ deleteAdmin(){
           <Col className='mt-5'>
             <div className='d-flex justify-content-between container'>
               <div className='mt-5'>
-                <h4><Link to='/administrators'><a className='text-dark mb-5'>Administrators</a></Link> &gt; Detail</h4>
+                <h4>List Genres</h4>
               </div>
+              <div className='mt-5'>
+                <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Genres</Button>
+              </div>
+            </div>
+          </Col>
+          <Col className='mt-5'>
+            <div className='container'>
+              <Dropdown className="mb-4 ml-2">
+                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                  Sort By
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
           </Col>
           <Col className='mt-1'>
             <div className='container'>
-              <Table bordered className='mt-5'>
+              <Table bordered className='mt-2'>
+                <thead>
                   <tr>
-                    <td><h6>Name</h6></td>
-                    <td>{this.state.name}</td>
+                    <th>Genre ID</th>
+                    <th>Name</th>
+                    <th>Action</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {this.state.data.map((genre, index) => (
                   <tr>
-                    <td><h6>Email</h6></td>
-                    <td>{this.state.email}</td>
+                    <th scope="row">{genre.id}</th>
+                    <td>{genre.name}</td>
+                    <td>
+                      <h6><Link to={{
+                          pathname: `/genres-detail/${genre.id}`,
+                          state: {
+                            id: `${genre.id}`,
+                            name: `${genre.name}`
+                          }
+                        }}><a>More... </a></Link></h6> 
+                    </td>
                   </tr>
+                  ))}
+                </tbody>
               </Table>
-              <div className='mt-4'>
-                <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>
-                <Button className='btn-danger ml-3' onClick={this.toggleDeleteModal}>Delete</Button>
+            </div>
+          </Col>
+          <Col className='mt-5'>
+            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+              <div>
+                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                
+              </div>
+              <div>
+                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                  return (
+                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                  )
+                })}
+              </div>
+              <div>
+                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
               </div>
             </div>
           </Col>
@@ -205,32 +247,21 @@ deleteAdmin(){
             </div>
           </Col>
         </Row>
-        
-         {/* Edit Modal */}
-         <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Admin</ModalHeader>
+
+        {/* Add Modal */}
+        <Modal isOpen={this.state.showAddModal}>
+          <Form onSubmit={this.handlerSubmit}>
+          <ModalHeader className='h1'>Add Genre</ModalHeader>
           <ModalBody>
             <h6>Name</h6>
-            <Input name='name' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.name}/>
-            <h6>Email</h6>
-            <Input name='email' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.email}/>
-            <h6>Password</h6>
-            <Input name='password' type='password' className='mb-2' onChange={this.handlerChange} value={this.state.password}/>
+            <Input name='name' onChange={this.handlerChange} type='text' className='mb-2'/>
           </ModalBody>
           <ModalFooter>
-            <Button color='primary' onClick={this.handlerUpdate}>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
+            <Button color='primary' type='submit'>Add</Button>
+            <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
           </ModalFooter>
+          </Form>
         </Modal>
-
-         {/* Delete Modal */}
-         <Modal isOpen={this.state.showDeleteModal}>
-            <ModalBody className='h4'>Are you sure?</ModalBody>
-            <ModalFooter>
-              <Button color='danger' onClick={this.deleteAdmin}>Delete</Button>
-              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
 
           {/* Logout Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>
@@ -245,4 +276,4 @@ deleteAdmin(){
   }
 }
 
-export default AdministratorsDetail
+export default Genres

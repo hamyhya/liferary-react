@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import Logo from '../assets/smeatech.png'
 import swal from 'sweetalert2'
 import axios from 'axios'
+import qs from 'querystring'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
   BrowserRouter as Router,
@@ -31,17 +32,25 @@ class LoginAdmin extends Component {
     }
 
 		const url = `${REACT_APP_URL}employes/login`
-		await axios.post(url, dataSubmit).then( (response) => {
+		await axios.post(url, qs.stringify(dataSubmit)).then( (response) => {
 				console.log(response);
-          this.setState( () => {
-            localStorage.setItem('token', 'true')
-            this.props.history.push('/dashboard')
-          })
+          // this.setState( () => {
+          //   localStorage.setItem('token', 'true')
+          //   this.props.history.push('/dashboard')
+          // })
         swal.fire({
 					icon: 'success',
 					title: 'Success',
 					text: 'Login successfully'
-				})
+        })
+        if (response.data.token) {
+          const role = {
+            roleName: 'admin'
+          }
+          localStorage.setItem('token', JSON.stringify(response.data))
+          localStorage.setItem('role', JSON.stringify(role))
+          this.props.history.push('/dashboard')
+        }
 			})
 			.catch(function (error) {
 				swal.fire({

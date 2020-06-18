@@ -145,6 +145,9 @@ class UserDetail extends Component {
                   <NavItem>
                     <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
                   </NavItem>
+                  <NavItem>
+                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                  </NavItem>
                 </Nav>
                   <span className="navbar-text">
                     <Form className="form-inline">

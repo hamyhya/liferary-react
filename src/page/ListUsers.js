@@ -10,30 +10,19 @@ import {Row, Col, Nav, Form, Button, Modal, ModalBody,
   NavItem,
   NavLink,Card, CardImg, CardTitle, CardText, CardDeck,
   CardSubtitle, CardBody} from 'reactstrap'
-import { Carousel, Jumbotron } from 'react-bootstrap'
+import { Carousel, Jumbotron, Dropdown } from 'react-bootstrap'
 
 import {
 	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
+import Token from '../services/Token'
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
+
 
 class ListUsers extends Component {
 	constructor(props){
 		super(props)
-		this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/login')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
 		this.state = {
 			showAddModal: false,
 			showLogoutModal: false,
@@ -53,7 +42,28 @@ class ListUsers extends Component {
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-		this.addBook = this.addBook.bind(this)
+		this.authCheck = this.authCheck.bind(this)
+	}
+	authCheck = () => {
+		const token = JSON.parse(localStorage.getItem('token'))
+		const role = JSON.parse(localStorage.getItem('role'))
+		if(role.roleName === 'user'){
+			if(!localStorage.getItem('token')){
+				this.props.history.push('/login')
+				swal.fire({
+					icon: 'error',
+					title: 'Nooooo!',
+					text: 'You have to login first'
+				})
+			}
+		} else {
+			this.props.history.push('/login')
+				swal.fire({
+					icon: 'error',
+					title: 'Nooooo!',
+					text: 'You have to login as user'
+				})
+		}
 	}
 	handlerChange = (e) =>{
 		this.setState({[e.target.name]: e.target.value})
@@ -81,37 +91,6 @@ class ListUsers extends Component {
 				})
 		})
 	}
-	async addBook (event) {
-		event.preventDefault()
-		const {REACT_APP_URL} = process.env
-		const dataSubmit = new FormData()
-		dataSubmit.append('picture', this.state.image)
-		dataSubmit.set('title', this.state.title)
-		dataSubmit.set('description', this.state.description)
-		dataSubmit.set('genre', this.state.genre)
-		dataSubmit.set('author', this.state.author)
-
-		const url = `${REACT_APP_URL}books`
-		await axios.post(url, dataSubmit).then( (response) => {
-				console.log(response);
-				this.setState({showAddModal: false})
-				this.fetchData()
-				swal.fire({
-					icon: 'success',
-					title: 'Success',
-					text: 'Nais! Book added'
-				})
-			})
-			.catch(function (error) {
-				swal.fire({
-					icon: 'error',
-					title: 'Hmmm!',
-					text: "Something's wrong, I can feel it"
-				})
-				console.log(error);
-			 })
-		this.props.history.push(`/dashboard`)
-	}
 	fetchData = async (params) => {
 		this.setState({isLoading: true})
 		const {REACT_APP_URL} = process.env
@@ -135,7 +114,7 @@ class ListUsers extends Component {
 	async componentDidMount(){
 		const param = qs.parse(this.props.location.search.slice(1))
 		await this.fetchData(param)
-		this.checkToken()
+		this.authCheck()
 		await this.genreList()
 	}
 	
@@ -151,10 +130,13 @@ class ListUsers extends Component {
 			<Row className='d-flex flex-column w-100'>
 				<Col className='w-100'>
 					<Navbar className='nav-dashboard fixed-top' light expand="md">
-						<Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						<Link to='/dashboard-user'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
 						<NavbarToggler onClick={this.toggleNavbar} />
 						<Collapse isOpen={this.state.showNavbar} navbar>
 							<Nav className="mr-auto" navbar>
+							<NavItem>
+                <Link to='/histories-user'><NavLink className='text-white'>My Histories</NavLink></Link>
+              </NavItem>
 							</Nav>
 								<span className="navbar-text">
 									<Form className="form-inline">
@@ -199,8 +181,15 @@ class ListUsers extends Component {
 				</Col>
 				<Col className='mt-5'>
 					<div className='container'>
-						{<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 0})}>Asc</Button>}&nbsp;|&nbsp;
-						{<Button className='btn-sm btn-sort' onClick={()=>this.fetchData({...params, sort: 1})}>Desc</Button>}
+						<Dropdown className="mb-4 ml-2">
+              <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                Sort By
+              </Dropdown.Toggle>
+            	<Dropdown.Menu>
+                <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
 					</div>
 				</Col>
 				<Col className='mt-1'>
