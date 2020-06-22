@@ -263,7 +263,7 @@ class Genres extends Component {
             <Input name='name' onChange={this.handlerChange} type='text' className='mb-2'/>
           </ModalBody>
           <ModalFooter>
-            <Button color='primary' type='submit'>Add</Button>
+            <Button color='primary' type='submit'>Add Genre</Button>
             <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
           </ModalFooter>
           </Form>
