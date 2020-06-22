@@ -31,10 +31,7 @@ class List extends Component {
 					title: 'Nooooo!',
 					text: 'You have to login first'
 				})
-      } 
-      // else {
-      //   props.history.push('/home')
-      // }
+      }
     }
 		this.state = {
 			showAddModal: false,

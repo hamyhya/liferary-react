@@ -41,6 +41,7 @@ class Genres extends Component {
     }
     this.state = {
       showNavbar: false,
+      showAddModal: false,
       showLogoutModal: false,
       pageInfo: {},
       search: '',
@@ -61,6 +62,11 @@ class Genres extends Component {
   toggleNavbar(){
 		this.setState({
 			showNavbar: !this.state.showNavbar
+		})
+  }
+  toggleAddModal(){
+		this.setState({
+			showAddModal: !this.state.showAddModal
 		})
   }
   logoutAuth = () => {

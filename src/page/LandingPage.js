@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import qs from 'querystring'
-import {Row, Col, Input, Container, Table, Button, Navbar, Form, 
+import {Row, Col, Input, Container, Table, Button, Navbar, Form, Card, CardImg, CardTitle, CardText, CardDeck,
+	CardSubtitle, CardBody
 } from 'reactstrap'
 import {
   BrowserRouter as Router,
@@ -81,24 +82,22 @@ class LandingPage extends Component {
             <Row className='mt-5 container'>
               <Col className='list-book-landing d-flex justify-content-center'>
                 <Row className=''>
-                {this.state.data.map((book, index) => (
-                    <Col md={4}>
-                      <div className="card-deck mt-4">
-                        <div className="card card-landing">
-                          <div className='card-img-landing bg-contain' style={{backgroundImage: `url(${book.picture})`}}>
-                          {/* <img className="card-img-top" src={book.picture} alt="Card image cap" /> */}
-                        </div>
-                          <div className="card-body">
-                            <h5 className="card-title">
-                              <Link to='/login'><a classNameName='text-black'>{book.title}</a>
-                              </Link>
-                            </h5>
-                            <p className="card-text">{book.description}</p>
-                          </div>
-                        </div>
-                      </div>
+                  <CardDeck>
+                  {this.state.data.map((book, index) => (
+                    <Col className='mt-4' md={4}>
+                      <Card>
+                        <CardImg top width="100%" src={book.picture} alt="Card image cap" />
+                        <CardBody>
+                          <CardTitle>
+                            <h4><Link to='/login'><a className='text-black'>{book.title}</a></Link></h4>
+                          </CardTitle>
+                          <CardSubtitle>By <b>{book.author}</b></CardSubtitle>
+                          <CardText>{book.description}</CardText>
+                        </CardBody>
+                      </Card>
                     </Col>
-                    ))}
+                  ))}
+                  </CardDeck>
                 </Row>
               </Col>
             </Row>
