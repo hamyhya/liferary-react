@@ -17,22 +17,24 @@ import {
 	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
+import {getBook} from '../redux/actions/book'
 
 class List extends Component {
 	constructor(props){
 		super(props)
-		const token = JSON.parse(localStorage.getItem('token'))
-		this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+		// const token = JSON.parse(localStorage.getItem('token'))
+		// this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
 		this.state = {
 			showAddModal: false,
 			showLogoutModal: false,
@@ -115,18 +117,17 @@ class List extends Component {
 			 })
 		this.props.history.push(`/dashboard`)
 	}
-	fetchData = async (params) => {
-		this.setState({isLoading: true})
-		const {REACT_APP_URL} = process.env
+	fetchData = (params) => {
 		const param = `${qs.stringify(params)}`
-		const url = `${REACT_APP_URL}books?${param}`
-		const results = await axios.get(url)
-		const {data} = results.data
-		const pageInfo = results.data.pageInfo
-		this.setState({data, pageInfo, isLoading: false})
-		if(params){
-			this.props.history.push(`?${param}`)
-		}
+		this.props.getBook(param).then( (response) => {
+
+			const pageInfo = this.props.book.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
 	}
 	genreList = async () => {
 		this.setState({isLoading: true})
@@ -136,22 +137,28 @@ class List extends Component {
 		this.setState({genreList: results.data.data})
   }
 	async componentDidMount(){
+	//  if(this.props.login.token === null) {
+	//  	this.props.history.push('/admin')
+	//  }
 		const param = qs.parse(this.props.location.search.slice(1))
 		await this.fetchData(param)
-		this.checkToken()
+		console.log(this.props.book.data)
+		// this.checkToken()
 		await this.genreList()
 	}
 	
 
 	render(){
+		const {dataBook, isLoading, pageInfo} = this.props.book
+		
 		const params = qs.parse(this.props.location.search.slice(1))
 		params.page = params.page || 1
-		params.search = params.search || ''
+		params.search = ''
 		params.sort = params.sort || 0
 
 		return(
 			<>
-			<Row className='d-flex flex-column w-100'>
+				<Row className='d-flex flex-column w-100'>
 				<Col className='w-100'>
 					<Navbar className='nav-dashboard fixed-top' light expand="md">
 						<Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
@@ -184,98 +191,108 @@ class List extends Component {
 							</Collapse>
 						</Navbar>
 				</Col>
-				<Col className='mt-5'>
-					<div className='container'>
-						<Jumbotron className='carousel-books mt-5'>
-							<Carousel>
-								{this.state.data.map((book, index) => (
-									<Carousel.Item>
-										<img style={{ height: '200px' }}
-											className="d-block"
-											src={book.picture}
-											alt="cover"
-										/>
-										<Carousel.Caption>
-											<h3 className="text-white">{book.title}</h3>
-											<p>{book.description}</p>
-										</Carousel.Caption>
-									</Carousel.Item>
-								))}
-							</Carousel>
-						</Jumbotron>
+				{isLoading ? (
+					<center className='mt-5'>
+					<div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+						<span class="sr-only">Loading...</span>
 					</div>
-				</Col>
-				<Col>
-					<div className='d-flex justify-content-between container'>
-						<div className=''>
-						  <h4>List Books</h4>
-						</div>
-						<div>
-							<Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Book</Button>
-						</div>
+				</center>
+				):(
+					<div className='mt-5'>
+						<Col className='mt-5'>
+							<div className='container'>
+								<Jumbotron className='carousel-books mt-5'>
+									<Carousel>
+										{dataBook.map((book, index) => (
+											<Carousel.Item>
+												<img style={{ height: '200px' }}
+													className="d-block"
+													src={book.picture}
+													alt="cover"
+												/>
+												<Carousel.Caption>
+													<h3 className="text-white">{book.title}</h3>
+													<p>{book.description}</p>
+												</Carousel.Caption>
+											</Carousel.Item>
+										))}
+									</Carousel>
+								</Jumbotron>
+							</div>
+						</Col>
+						<Col>
+							<div className='d-flex justify-content-between container'>
+								<div className=''>
+									<h4>List Books</h4>
+								</div>
+								<div>
+									<Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Book</Button>
+								</div>
+							</div>
+						</Col>
+						<Col className='mt-5'>
+							<div className='container'>
+								<Dropdown className="mb-4 ml-2">
+									<Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+										Sort By
+									</Dropdown.Toggle>
+										<Dropdown.Menu>
+												<Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+												<Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+										</Dropdown.Menu>
+									</Dropdown>
+							</div>
+						</Col>
+						<Col>
+							<div className='container'>
+								<Row>
+									<CardDeck>
+									{dataBook.map((book, index) => (
+										<Col className='mt-4' md={4}>
+											<Card>
+												<CardImg top width="100%" src={book.picture} alt="Card image cap" />
+												<CardBody>
+													<CardTitle><h4><Link to={{
+															pathname: `/detail/${book.id}`,
+															state: {
+																id: `${book.id}`,
+																title: `${book.title}`,
+																description: `${book.description}`,
+																genre: `${book.genre}`,
+																author: `${book.author}`,
+																picture: `${book.picture}`
+															}
+														}}><a className='text-black'>{book.title}</a></Link></h4></CardTitle>
+													<CardSubtitle>By <b>{book.author}</b></CardSubtitle>
+													<CardText>{book.description}</CardText>
+												</CardBody>
+											</Card>
+										</Col>
+									))}
+									</CardDeck>
+								</Row>
+							</div>
+						</Col>
+						<Col className='mt-5'>
+							<div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+								<div>
+									{<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+									
+								</div>
+								<div>
+									{[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+										return (
+										<Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+										)
+									})}
+								</div>
+								<div>
+									<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+								</div>
+							</div>
+						</Col>
 					</div>
-				</Col>
-				<Col className='mt-5'>
-					<div className='container'>
-						<Dropdown className="mb-4 ml-2">
-              <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                Sort By
-              </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                    <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-					</div>
-				</Col>
-				<Col>
-					<div className='container'>
-						<Row>
-							<CardDeck>
-							{this.state.data.map((book, index) => (
-								<Col className='mt-4' md={4}>
-									<Card>
-										<CardImg top width="100%" src={book.picture} alt="Card image cap" />
-										<CardBody>
-											<CardTitle><h4><Link to={{
-													pathname: `/detail/${book.id}`,
-													state: {
-														id: `${book.id}`,
-														title: `${book.title}`,
-														description: `${book.description}`,
-														genre: `${book.genre}`,
-														author: `${book.author}`,
-														picture: `${book.picture}`
-													}
-												}}><a className='text-black'>{book.title}</a></Link></h4></CardTitle>
-											<CardSubtitle>By <b>{book.author}</b></CardSubtitle>
-											<CardText>{book.description}</CardText>
-										</CardBody>
-									</Card>
-								</Col>
-							))}
-							</CardDeck>
-						</Row>
-					</div>
-				</Col>
-				<Col className='mt-5'>
-					<div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-						<div>
-							{<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-							
-						</div>
-						<div>
-							{[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-								return (
-								<Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-								)
-							})}
-						</div>
-						<div>
-							<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-						</div>
-					</div>
-				</Col>
+				)}
 			</Row>
 			<Row className='w-100 '>
 				<Col className='mt-5 w-100'>
@@ -332,4 +349,11 @@ class List extends Component {
 	}
 }
 
-export default List
+const mapStateToProps = state => ({
+	book: state.book,
+	login: state.login,
+})
+
+const mapDispatchToProps = { getBook }
+
+export default connect(mapStateToProps, mapDispatchToProps)(List)

@@ -5,7 +5,6 @@ import axios from 'axios'
 import qs from 'querystring'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 

@@ -3,11 +3,14 @@ import Logo from '../assets/smeatech.png'
 import swal from 'sweetalert2'
 import axios from 'axios'
 import qs from 'querystring'
+import {connect} from 'react-redux'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+
+import {loginAdmin} from '../redux/actions/login'
 
 class LoginAdmin extends Component {
   constructor(props){
@@ -17,7 +20,7 @@ class LoginAdmin extends Component {
       password: ''
     }
     this.LoginAdmin = this.LoginAdmin.bind(this)
-    this.checkLogin = this.checkLogin.bind(this)
+    // this.checkLogin = this.checkLogin.bind(this)
   }
 
   handlerChange = (e) =>{
@@ -25,49 +28,64 @@ class LoginAdmin extends Component {
 	}
   async LoginAdmin (event) {
 		event.preventDefault()
-		const {REACT_APP_URL} = process.env
-		const dataSubmit = {
-      email: this.state.email,
-      password: this.state.password
-    }
+		// const {REACT_APP_URL} = process.env
+		const {email, password} = this.state
 
-		const url = `${REACT_APP_URL}employes/login`
-		await axios.post(url, qs.stringify(dataSubmit)).then( (response) => {
-				console.log(response);
-          // this.setState( () => {
-          //   localStorage.setItem('token', 'true')
-          //   this.props.history.push('/dashboard')
-          // })
-        swal.fire({
-					icon: 'success',
-					title: 'Success',
-					text: 'Login successfully'
-        })
-        if (response.data.token) {
-          const role = {
-            roleName: 'admin'
-          }
-          localStorage.setItem('token', JSON.stringify(response.data))
-          localStorage.setItem('role', JSON.stringify(role))
-          this.props.history.push('/dashboard')
-        }
-			})
-			.catch(function (error) {
-				swal.fire({
-					icon: 'error',
-					title: 'Hmmm!',
-					text: "Data doesn't match our records"
-				})
-				console.log(error);
-			 })
+    this.props.loginAdmin(email, password).then((response) => {
+      this.props.history.push('/dashboard')
+      swal.fire({
+  			icon: 'success',
+  			title: 'Success',
+  			text: 'Login successfully'
+      })
+    }).catch(function (error) {
+      swal.fire({
+        icon: 'error',
+        title: 'Hmmm!',
+        text: "Data doesn't match our records"
+      })
+    })
+
+		// const url = `${REACT_APP_URL}employes/login`
+		// await axios.post(url, qs.stringify(dataSubmit)).then( (response) => {
+		// 		console.log(response);
+    //       // this.setState( () => {
+    //       //   localStorage.setItem('token', 'true')
+    //       //   this.props.history.push('/dashboard')
+    //       // })
+    //     swal.fire({
+		// 			icon: 'success',
+		// 			title: 'Success',
+		// 			text: 'Login successfully'
+    //     })
+    //     if (response.data.token) {
+    //       const role = {
+    //         roleName: 'admin'
+    //       }
+    //       localStorage.setItem('token', JSON.stringify(response.data))
+    //       localStorage.setItem('role', JSON.stringify(role))
+    //       this.props.history.push('/dashboard')
+    //     }
+		// 	})
+		// 	.catch(function (error) {
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Hmmm!',
+		// 			text: "Data doesn't match our records"
+		// 		})
+		// 		console.log(error);
+		// 	 })
   }
   checkLogin = () => {
-    if (localStorage.getItem('token')) {
+    console.log(this.props.login.token)
+    if(this.props.login.token !== null){
       this.props.history.push('/dashboard')
     }
   }
-  async componentDidMount(){
-    await this.checkLogin()
+  componentDidUpdate() {
+  }
+  componentDidMount(){
+   this.checkLogin()
 	}
 
   render(){
@@ -126,4 +144,10 @@ class LoginAdmin extends Component {
   }
 }
 
-export default LoginAdmin
+const mapStateToProps = (state) => ({
+  login: state.login
+})
+
+const mapDispatchToProps = {loginAdmin}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginAdmin)
