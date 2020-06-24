@@ -24,21 +24,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
+import {getGenre, postGenre} from '../redux/actions/genre'
 
 class Genres extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showNavbar: false,
       showAddModal: false,
@@ -85,14 +87,11 @@ class Genres extends Component {
   handlerSubmit = (event) => {
     event.preventDefault()
     this.setState({isLoading: true})
-    const authorData = {
+    const dataSubmit = {
         name: this.state.name,
     }
     
-    console.log(authorData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}genres`
-    axios.post(url, authorData).then( (response) => {
+    this.props.postGenre(dataSubmit).then( (response) => {
         console.log(response)
       })
       .catch(function (error) {
@@ -116,28 +115,29 @@ class Genres extends Component {
     })
   }
   fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}genres?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
-    }
+		this.props.getGenre(param).then( (response) => {
+
+			const pageInfo = this.props.genre.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
   }
   async componentDidMount(){
-		this.checkToken()
+		// this.checkToken()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
 
   render(){
+    const {dataGenre, isLoading} = this.props.genre
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
-    params.search = params.search || ''
+    params.search = ''
     params.sort = params.sort || 0
     return(
       <>
@@ -174,77 +174,87 @@ class Genres extends Component {
                 </Collapse>
               </Navbar>
           </Col>
-          <Col className='mt-5'>
-            <div className='d-flex justify-content-between container'>
-              <div className='mt-5'>
-                <h4>List Genres</h4>
+          {isLoading ? (
+            <center className='mt-5'>
+              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span class="sr-only">Loading...</span>
               </div>
-              <div className='mt-5'>
-                <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Genres</Button>
-              </div>
+            </center>
+          ):(
+            <div>
+              <Col className='mt-5'>
+                <div className='d-flex justify-content-between container'>
+                  <div className='mt-5'>
+                    <h4>List Genres</h4>
+                  </div>
+                  <div className='mt-5'>
+                    <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Genres</Button>
+                  </div>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='container'>
+                  <Dropdown className="mb-4 ml-2">
+                    <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                      Sort By
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </Col>
+              <Col className='mt-1'>
+                <div className='container'>
+                  <Table bordered className='mt-2'>
+                    <thead>
+                      <tr>
+                        <th>Genre ID</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataGenre.map((genre, index) => (
+                      <tr>
+                        <th scope="row">{genre.id}</th>
+                        <td>{genre.name}</td>
+                        <td>
+                          <h6><Link to={{
+                              pathname: `/genres-detail/${genre.id}`,
+                              state: {
+                                id: `${genre.id}`,
+                                name: `${genre.name}`
+                              }
+                            }}><a>More... </a></Link></h6> 
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+                  <div>
+                    {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                    
+                  </div>
+                  <div>
+                    {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                      return (
+                      <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                  </div>
+                </div>
+              </Col>
             </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='container'>
-              <Dropdown className="mb-4 ml-2">
-                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                  Sort By
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-          <Col className='mt-1'>
-            <div className='container'>
-              <Table bordered className='mt-2'>
-                <thead>
-                  <tr>
-                    <th>Genre ID</th>
-                    <th>Name</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.data.map((genre, index) => (
-                  <tr>
-                    <th scope="row">{genre.id}</th>
-                    <td>{genre.name}</td>
-                    <td>
-                      <h6><Link to={{
-                          pathname: `/genres-detail/${genre.id}`,
-                          state: {
-                            id: `${genre.id}`,
-                            name: `${genre.name}`
-                          }
-                        }}><a>More... </a></Link></h6> 
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-              <div>
-                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                
-              </div>
-              <div>
-                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                  return (
-                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                  )
-                })}
-              </div>
-              <div>
-                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-              </div>
-            </div>
-          </Col>
+          )}
         </Row>
         <Row className='w-100 '>
           <Col className='mt-5 w-100'>
@@ -282,4 +292,10 @@ class Genres extends Component {
   }
 }
 
-export default Genres
+const mapStateToProps = state => ({
+  genre: state.genre
+})
+
+const mapDispatchToProps = {getGenre, postGenre}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Genres)

@@ -3,20 +3,20 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMsg: '',
-  dataBook: [],
+  dataGenre: [],
   pageInfo: []
 }
 
-const book = (state=initialState, action) => {
+const genre = (state=initialState, action) => {
   switch(action.type){
-    case 'GETBOOK_PENDING': {
+    case 'GETGENRE_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETBOOK_REJECTED': {
+    case 'GETGENRE_REJECTED': {
       return {
         ...state,
         isLoading: false,
@@ -24,72 +24,72 @@ const book = (state=initialState, action) => {
         errorMsg: action.payload.response.data.message,
       }
     }
-    case 'GETBOOK_FULFILLED': {
+    case 'GETGENRE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false,
-        dataBook: action.payload.data.data,
+        dataGenre: action.payload.data.data,
         pageInfo: action.payload.data.pageInfo
       }
     }
-    case 'POSTBOOK_PENDING': {
+    case 'POSTGENRE_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'POSTBOOK_REJECTED': {
+    case 'POSTGENRE_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'POSTBOOK_FULFILLED': {
+    case 'POSTGENRE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'PATCHBOOK_PENDING': {
+    case 'PATCHGENRE_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'PATCHBOOK_REJECTED': {
+    case 'PATCHGENRE_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'PATCHBOOK_FULFILLED': {
+    case 'PATCHGENRE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'DELETEBOOK_PENDING': {
+    case 'DELETEGENRE_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'DELETEBOOK_REJECTED': {
+    case 'DELETEGENRE_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'DELETEBOOK_FULFILLED': {
+    case 'DELETEGENRE_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -104,4 +104,4 @@ const book = (state=initialState, action) => {
   }
 }
 
-export default book
+export default genre

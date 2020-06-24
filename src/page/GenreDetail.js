@@ -13,21 +13,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
+import {patchGenre, deleteGenre} from '../redux/actions/genre'
 
 class GenreDetail extends Component {
   constructor(props){
     super(props)
-    this.authCheck = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.authCheck = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showAddModal: false,
       showSuccessModal: false,
@@ -78,18 +80,18 @@ class GenreDetail extends Component {
 	}
   handlerUpdate = (event) => {
     event.preventDefault()
-    this.setState({isLoading: true})
-    const authorData = {
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password
+    const dataSubmit = {
+        name: this.state.name
     }
     
-    console.log(authorData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}genres/${this.state.id}`
-    axios.patch(url, authorData).then( (response) => {
-        console.log(response)
+    const {id} = this.state
+    this.props.patchGenre(id, dataSubmit).then( (response) => {
+        swal.fire({
+         icon: 'success',
+         title: 'Success',
+         text: 'Yahaha! edit genre success'
+       })
+       this.props.history.push('/genres')
       })
       .catch(function (error) {
         console.log(error.response)
@@ -99,24 +101,24 @@ class GenreDetail extends Component {
 					text: "Something's wrong, I can feel it"
 				})
        }) 
-       swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Yahaha! edit genre success'
-      })
-      this.props.history.push('/genres')
 }
 deleteGenre(){
-  const {REACT_APP_URL} = process.env
-  console.log(this.state.id)
-  axios.delete(`${REACT_APP_URL}genres/${this.state.id}`)
-  this.setState({showDeleteModal: !this.state.showDeleteModal})
-  this.props.history.push('/genres')
-  swal.fire({
-    icon: 'success',
-    title: 'Success',
-    text: 'Poof! delete genre success'
-  })
+  const {id} = this.state
+  this.props.deleteGenre(id).then((response) => {
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Poof! delete genre success'
+    })
+    this.props.history.push('/genres')
+  }).catch(function (error) {
+    swal.fire({
+      icon: 'error',
+      title: 'Oops!',
+      text: "Something's wrong, I can feel it"
+    })
+    this.props.history.push('/genres')
+   })
 }
   toggleAddModal(){
     this.setState({
@@ -134,7 +136,7 @@ deleteGenre(){
     })
   }
   async componentDidMount(){
-    this.authCheck()
+    // this.authCheck()
   }
 
   render(){
@@ -215,7 +217,6 @@ deleteGenre(){
           <ModalBody>
             <h6>Name</h6>
             <Input name='name' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.name}/>
-            <h6>Email</h6>
           </ModalBody>
           <ModalFooter>
             <Button color='primary' onClick={this.handlerUpdate}>Edit</Button>
@@ -245,4 +246,6 @@ deleteGenre(){
   }
 }
 
-export default GenreDetail
+const mapDispatchToProps = {patchGenre, deleteGenre}
+
+export default connect (null, mapDispatchToProps)(GenreDetail)

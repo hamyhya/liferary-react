@@ -3,20 +3,20 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMsg: '',
-  dataBook: [],
+  dataUser: [],
   pageInfo: []
 }
 
-const book = (state=initialState, action) => {
+const user = (state=initialState, action) => {
   switch(action.type){
-    case 'GETBOOK_PENDING': {
+    case 'GETUSER_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETBOOK_REJECTED': {
+    case 'GETUSER_REJECTED': {
       return {
         ...state,
         isLoading: false,
@@ -24,72 +24,72 @@ const book = (state=initialState, action) => {
         errorMsg: action.payload.response.data.message,
       }
     }
-    case 'GETBOOK_FULFILLED': {
+    case 'GETUSER_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false,
-        dataBook: action.payload.data.data,
+        dataUser: action.payload.data.data,
         pageInfo: action.payload.data.pageInfo
       }
     }
-    case 'POSTBOOK_PENDING': {
+    case 'POSTUSER_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'POSTBOOK_REJECTED': {
+    case 'POSTUSER_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'POSTBOOK_FULFILLED': {
+    case 'POSTUSER_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'PATCHBOOK_PENDING': {
+    case 'PATCHUSER_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'PATCHBOOK_REJECTED': {
+    case 'PATCHUSER_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'PATCHBOOK_FULFILLED': {
+    case 'PATCHUSER_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'DELETEBOOK_PENDING': {
+    case 'DELETEUSER_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'DELETEBOOK_REJECTED': {
+    case 'DELETEUSER_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'DELETEBOOK_FULFILLED': {
+    case 'DELETEUSER_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -104,4 +104,4 @@ const book = (state=initialState, action) => {
   }
 }
 
-export default book
+export default user

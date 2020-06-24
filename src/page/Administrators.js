@@ -24,21 +24,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
+import {getAdmin, postAdmin} from '../redux/actions/admin'
 
 class Administrators extends Component {
   constructor(props){
     super(props)
-    this.authCheck = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.authCheck = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showAddModal: false,
       showNavbar: false,
@@ -123,25 +125,26 @@ class Administrators extends Component {
     })
   }
   fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}employes?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
-    }
+		this.props.getAdmin(param).then( (response) => {
+
+			const pageInfo = this.props.admin.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
   }
   async componentDidMount(){
-		this.authCheck()
+		// this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
 
   render(){
+    const {dataAdmin, isLoading} = this.props.admin
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.search = params.search || ''
@@ -181,81 +184,91 @@ class Administrators extends Component {
                 </Collapse>
               </Navbar>
           </Col>
-          <Col className='mt-5'>
-            <div className='d-flex justify-content-between container'>
-              <div className='mt-5'>
-                <h4>List Administrators</h4>
+          {isLoading ? (
+            <center className='mt-5'>
+              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span class="sr-only">Loading...</span>
               </div>
-              <div className='mt-5'>
-                <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Admin</Button>
-              </div>
+            </center>
+          ):(
+            <div>
+              <Col className='mt-5'>
+                <div className='d-flex justify-content-between container'>
+                  <div className='mt-5'>
+                    <h4>List Administrators</h4>
+                  </div>
+                  <div className='mt-5'>
+                    <Button className='btn btn-add-admin' onClick={this.toggleAddModal}>Add Admin</Button>
+                  </div>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='container'>
+                  <Dropdown className="mb-4 ml-2">
+                    <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                      Sort By
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </Col>
+              <Col className='mt-1'>
+                <div className='container'>
+                  <Table bordered className='mt-2'>
+                    <thead>
+                      <tr>
+                        <th>Admin ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataAdmin.map((admin, index) => (
+                      <tr>
+                        <th scope="row">{admin.id}</th>
+                        <td>{admin.name}</td>
+                        <td>{admin.email}</td>
+                        <td>
+                          <h6><Link to={{
+                              pathname: `/administrators-detail/${admin.id}`,
+                              state: {
+                                id: `${admin.id}`,
+                                name: `${admin.name}`,
+                                email: `${admin.email}`,
+                                password: `${admin.password}`
+                              }
+                            }}><a>More... </a></Link></h6> 
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+                  <div>
+                    {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                    
+                  </div>
+                  <div>
+                    {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                      return (
+                      <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                  </div>
+                </div>
+              </Col>
             </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='container'>
-              <Dropdown className="mb-4 ml-2">
-                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                  Sort By
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-          <Col className='mt-1'>
-            <div className='container'>
-              <Table bordered className='mt-2'>
-                <thead>
-                  <tr>
-                    <th>Admin ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.data.map((admin, index) => (
-                  <tr>
-                    <th scope="row">{admin.id}</th>
-                    <td>{admin.name}</td>
-                    <td>{admin.email}</td>
-                    <td>
-                      <h6><Link to={{
-                          pathname: `/administrators-detail/${admin.id}`,
-                          state: {
-                            id: `${admin.id}`,
-                            name: `${admin.name}`,
-                            email: `${admin.email}`,
-                            password: `${admin.password}`
-                          }
-                        }}><a>More... </a></Link></h6> 
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-              <div>
-                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                
-              </div>
-              <div>
-                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                  return (
-                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                  )
-                })}
-              </div>
-              <div>
-                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-              </div>
-            </div>
-          </Col>
+          )}
         </Row>
         <Row className='w-100 '>
           <Col className='mt-5 w-100'>
@@ -297,4 +310,10 @@ class Administrators extends Component {
   }
 }
 
-export default Administrators
+const mapStateToProps = state => ({
+  admin: state.admin
+})
+
+const mapDispatchToProps = {getAdmin, postAdmin}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Administrators)

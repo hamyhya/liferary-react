@@ -24,20 +24,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import  {connect} from 'react-redux'
+
+import {getUser} from '../redux/actions/user'
 
 class Users extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showAddModal: false,
       showLogoutModal: false,
@@ -87,28 +90,29 @@ class Users extends Component {
     })
   }
   fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}users?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
-    }
+		this.props.getUser(param).then( (response) => {
+
+			const pageInfo = this.props.user.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
   }
   async componentDidMount(){
-		this.checkToken()
+		// this.checkToken()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
 
   render(){
+    const {dataUser, isLoading} = this.props.user
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
-    params.search = params.search || ''
+    params.search = ''
     params.sort = params.sort || 0
     return(
       <>
@@ -145,81 +149,91 @@ class Users extends Component {
                 </Collapse>
               </Navbar>
           </Col>
-          <Col className='mt-5'>
-            <div className='d-flex justify-content-between container'>
-              <div className='mt-5'>
-                <h4>List Users  </h4>
+          {isLoading ? (
+            <center className='mt-5'>
+              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span class="sr-only">Loading...</span>
               </div>
+            </center>
+          ):(
+            <div>
+              <Col className='mt-5'>
+                <div className='d-flex justify-content-between container'>
+                  <div className='mt-5'>
+                    <h4>List Users  </h4>
+                  </div>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='container'>
+                  <Dropdown className="mb-4 ml-2">
+                    <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                      Sort By
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </Col>
+              <Col className='mt-1'>
+                <div className='container'>
+                  <Table bordered className='mt-2'>
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataUser.map((user, index) => (
+                      <tr>
+                        <th scope="row">{user.id}</th>
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>{user.created_at}</td>
+                        <td>
+                        <h6>
+                          <Link to={{
+                              pathname: `/users-detail/${user.id}`,
+                              state: {
+                                id: `${user.id}`,
+                                name: `${user.name}`,
+                                email: `${user.email}`,
+                                created_at: `${user.created_at}`
+                              }
+                            }}><a>More...</a></Link></h6>
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+                  <div>
+                    {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                    
+                  </div>
+                  <div>
+                    {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                      return (
+                      <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                  </div>
+                </div>
+              </Col>
             </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='container'>
-              <Dropdown className="mb-4 ml-2">
-                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                  Sort By
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-          <Col className='mt-1'>
-            <div className='container'>
-              <Table bordered className='mt-2'>
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.data.map((user, index) => (
-                  <tr>
-                    <th scope="row">{user.id}</th>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.created_at}</td>
-                    <td>
-                    <h6>
-                      <Link to={{
-                          pathname: `/users-detail/${user.id}`,
-                          state: {
-                            id: `${user.id}`,
-                            name: `${user.name}`,
-                            email: `${user.email}`,
-                            created_at: `${user.created_at}`
-                          }
-                        }}><a>More...</a></Link></h6>
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-              <div>
-                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                
-              </div>
-              <div>
-                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                  return (
-                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                  )
-                })}
-              </div>
-              <div>
-                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-              </div>
-            </div>
-          </Col>
+          )}
         </Row>
         <Row className='w-100 '>
           <Col className='mt-5 w-100'>
@@ -289,4 +303,10 @@ class Users extends Component {
   }
 }
 
-export default Users
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+const mapDispatchToProps = {getUser}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Users)

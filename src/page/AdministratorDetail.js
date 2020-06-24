@@ -13,20 +13,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {deleteAdmin, patchAdmin} from '../redux/actions/admin'
 
 class AdministratorsDetail extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showSuccessModal: false,
       showLogoutModal: false,
@@ -82,10 +85,8 @@ class AdministratorsDetail extends Component {
         password: this.state.password
     }
     
-    console.log(authorData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}employes/${this.state.id}`
-    axios.patch(url, authorData).then( (response) => {
+    const {id} = this.state
+    this.props.patchAdmin(id, authorData).then( (response) => {
         console.log(response)
       })
       .catch(function (error) {
@@ -104,15 +105,14 @@ class AdministratorsDetail extends Component {
       this.props.history.push('/administrators')
 }
 deleteAdmin(){
-  const {REACT_APP_URL} = process.env
-  console.log(this.state.id)
-  axios.delete(`${REACT_APP_URL}employes/${this.state.id}`)
-  this.setState({showDeleteModal: !this.state.showDeleteModal})
-  this.props.history.push('/administrators')
-  swal.fire({
-    icon: 'success',
-    title: 'Success',
-    text: 'Poof! delete admin success'
+  const {id} = this.state
+  this.props.deleteAdmin(id).then((response) => {
+    swal.fire({
+      icon: 'success',
+      title: 'Success',
+      text: 'Poof! delete admin success'
+    })
+    this.props.history.push('/administrators')
   })
 }
   toggleAddModal(){
@@ -131,7 +131,7 @@ deleteAdmin(){
     })
   }
   async componentDidMount(){
-    this.checkToken()
+  //  this.checkToken()
   }
 
   render(){
@@ -245,4 +245,6 @@ deleteAdmin(){
   }
 }
 
-export default AdministratorsDetail
+const mapDispatchToProps = {deleteAdmin, patchAdmin}
+
+export default connect(null, mapDispatchToProps)(AdministratorsDetail)

@@ -19,7 +19,7 @@ import {
 } from "react-router-dom";
 import {connect} from 'react-redux'
 
-import {getBook} from '../redux/actions/book'
+import {getBook, postBook} from '../redux/actions/book'
 
 class List extends Component {
 	constructor(props){
@@ -86,9 +86,8 @@ class List extends Component {
 				})
 		})
 	}
-	async addBook (event) {
+	addBook (event) {
 		event.preventDefault()
-		const {REACT_APP_URL} = process.env
 		const dataSubmit = new FormData()
 		dataSubmit.append('picture', this.state.image)
 		dataSubmit.set('title', this.state.title)
@@ -96,8 +95,7 @@ class List extends Component {
 		dataSubmit.set('genre', this.state.genre)
 		dataSubmit.set('author', this.state.author)
 
-		const url = `${REACT_APP_URL}books`
-		await axios.post(url, dataSubmit, {headers: Token()}).then( (response) => {
+		this.props.postBook(dataSubmit).then( (response) => {
 				console.log(response);
 				this.setState({showAddModal: false})
 				this.fetchData()
@@ -142,7 +140,6 @@ class List extends Component {
 	//  }
 		const param = qs.parse(this.props.location.search.slice(1))
 		await this.fetchData(param)
-		console.log(this.props.book.data)
 		// this.checkToken()
 		await this.genreList()
 	}
@@ -193,10 +190,10 @@ class List extends Component {
 				</Col>
 				{isLoading ? (
 					<center className='mt-5'>
-					<div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
-						<span class="sr-only">Loading...</span>
-					</div>
-				</center>
+						<div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+							<span class="sr-only">Loading...</span>
+						</div>
+					</center>
 				):(
 					<div className='mt-5'>
 						<Col className='mt-5'>
@@ -354,6 +351,6 @@ const mapStateToProps = state => ({
 	login: state.login,
 })
 
-const mapDispatchToProps = { getBook }
+const mapDispatchToProps = { getBook, postBook }
 
 export default connect(mapStateToProps, mapDispatchToProps)(List)

@@ -9,20 +9,23 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {deleteBook, patchBook} from '../redux/actions/book'
 
 class Detail extends Component {
   constructor(props){
     super(props)
-    this.authCheck = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.authCheck = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showEditModal: false,
       showDeleteModal: false,
@@ -104,15 +107,25 @@ class Detail extends Component {
       showBorrowModal: !this.state.showBorrowModal
     })
   }
-  async deleteBook(){
-    const {REACT_APP_URL} = process.env
-    await axios.delete(`${REACT_APP_URL}books/${this.state.id}`)
-    swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: 'Poof! delete success'
+  deleteBook(){
+    const {id} = this.state
+    this.props.deleteBook(id).then((response) => {
+      swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Poof! delete success'
+      })
+      this.props.history.push('/dashboard')
     })
-    this.props.history.push('/dashboard')
+
+    // const {REACT_APP_URL} = process.env
+    // await axios.delete(`${REACT_APP_URL}books/${this.state.id}`)
+    // swal.fire({
+    //   icon: 'success',
+    //   title: 'Success',
+    //   text: 'Poof! delete success'
+    // })
+    // this.props.history.push('/dashboard')
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
@@ -127,11 +140,8 @@ class Detail extends Component {
 		bookData.set('genre', this.state.genre)
 		bookData.set('author', this.state.author)
     
-    console.log(bookData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}books/${this.state.id}`
-    axios.patch(url, bookData).then( (response) => {
-        console.log(response)
+    const {id} = this.state
+    this.props.patchBook(id, bookData).then( (response) => {
       })
       .catch(function (error) {
         console.log(error.response);
@@ -173,7 +183,7 @@ class Detail extends Component {
   }
   
 	async componentDidMount(){
-		this.authCheck()
+		// this.authCheck()
     const data = await this.fetchData()
     await this.genreList()
     await this.adminList()
@@ -266,4 +276,6 @@ class Detail extends Component {
   }
 }
 
-export default Detail
+const mapDispatchToProps = {deleteBook, patchBook}
+
+export default connect(null, mapDispatchToProps)(Detail)

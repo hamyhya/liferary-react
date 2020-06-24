@@ -3,20 +3,20 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMsg: '',
-  dataBook: [],
+  dataAdmin: [],
   pageInfo: []
 }
 
-const book = (state=initialState, action) => {
+const admin = (state=initialState, action) => {
   switch(action.type){
-    case 'GETBOOK_PENDING': {
+    case 'GETADMIN_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETBOOK_REJECTED': {
+    case 'GETADMIN_REJECTED': {
       return {
         ...state,
         isLoading: false,
@@ -24,72 +24,72 @@ const book = (state=initialState, action) => {
         errorMsg: action.payload.response.data.message,
       }
     }
-    case 'GETBOOK_FULFILLED': {
+    case 'GETADMIN_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false,
-        dataBook: action.payload.data.data,
+        dataAdmin: action.payload.data.data,
         pageInfo: action.payload.data.pageInfo
       }
     }
-    case 'POSTBOOK_PENDING': {
+    case 'POSTADMIN_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'POSTBOOK_REJECTED': {
+    case 'POSTADMIN_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'POSTBOOK_FULFILLED': {
+    case 'POSTADMIN_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'PATCHBOOK_PENDING': {
+    case 'PATCHADMIN_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'PATCHBOOK_REJECTED': {
+    case 'PATCHADMIN_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'PATCHBOOK_FULFILLED': {
+    case 'PATCHADMIN_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'DELETEBOOK_PENDING': {
+    case 'DELETEADMIN_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'DELETEBOOK_REJECTED': {
+    case 'DELETEADMIN_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'DELETEBOOK_FULFILLED': {
+    case 'DELETEADMIN_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -104,4 +104,4 @@ const book = (state=initialState, action) => {
   }
 }
 
-export default book
+export default admin

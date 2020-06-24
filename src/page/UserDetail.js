@@ -23,24 +23,24 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
-import logo from '../assets/smeatech.png'
-import profile from '../assets/profile.png'
-import card from '../assets/dilan-card.png'
+import {deleteUser} from '../redux/actions/user'
+
 
 class UserDetail extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showAddModal: false,
       showSuccessModal: false,
@@ -54,7 +54,7 @@ class UserDetail extends Component {
       created_at: props.location.state.created_at,
       data: []
     }
-    this.deleteTransaction = this.deleteTransaction.bind(this)
+    this.deleteUser = this.deleteUser.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
@@ -88,16 +88,15 @@ class UserDetail extends Component {
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
-  deleteTransaction(){
-    const {REACT_APP_URL} = process.env
-    console.log(this.state.id)
-    axios.delete(`${REACT_APP_URL}users/${this.state.id}`)
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
-    this.props.history.push('/users')
-    swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: 'Poof! User deleted'
+  deleteUser(){
+    const {id} = this.state
+    this.props.deleteUser(id).then((response) => {
+      swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Poof! delete genre success'
+      })
+      this.props.history.push('/users')
     })
   }
   toggleAddModal(){
@@ -116,7 +115,7 @@ class UserDetail extends Component {
     })
   }
   async componentDidMount(){
-		this.checkToken()
+		// this.checkToken()
   }
 
   render(){
@@ -234,7 +233,7 @@ class UserDetail extends Component {
          <Modal isOpen={this.state.showDeleteModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick={this.deleteTransaction}>Delete</Button>
+              <Button color='danger' onClick={this.deleteUser}>Delete</Button>
               <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -252,4 +251,6 @@ class UserDetail extends Component {
   }
 }
 
-export default UserDetail
+const mapDispatchToProps = {deleteUser}
+
+export default connect(null, mapDispatchToProps)(UserDetail)
