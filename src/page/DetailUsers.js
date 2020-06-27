@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import {Col, Row, Button, Modal, ModalHeader, 
   ModalBody, ModalFooter, Input, Form} from 'reactstrap'
 import {
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getGenreId} from '../redux/actions/genre'
@@ -15,16 +15,6 @@ import {postTransaction} from '../redux/actions/transaction'
 class DetailUsers extends Component {
   constructor(props){
     super(props)
-    this.authCheck = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/login')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
     this.state = {
       id: props.match.params.id,
       title: props.location.state.title,
@@ -34,7 +24,8 @@ class DetailUsers extends Component {
       picture: props.location.state.picture,
       user_id: 0,
       employee_id: 0,
-      genreName: ''
+      genreName: '',
+      token: jwt.decode(this.props.login.token)
     }
     this.borrowBook = this.borrowBook.bind(this)
   }
@@ -43,10 +34,9 @@ class DetailUsers extends Component {
   }
   borrowBook = (event) => {
     event.preventDefault()
-		const token = JSON.parse(localStorage.getItem('token'))
     const authorData = {
         book_id: this.state.id,
-        user_id: token.id,
+        user_id: this.state.token.id,
         employee_id: 7
     }
     
@@ -76,8 +66,26 @@ class DetailUsers extends Component {
 		const {genre} = this.state
 		this.props.getGenreId(genre)
   }
-  
-	async componentDidMount(){
+  authCheck = () => {
+		
+    if((this.props.login.token === null)){
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+    } else if (this.state.token.role !== 'user') {
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+		}
+  }
+	componentDidMount(){
+    console.log(this.state.token)
 		this.authCheck()
     this.fetchData()
 	}
@@ -133,7 +141,8 @@ class DetailUsers extends Component {
 }
 
 const mapStateToProps = state => ({
-  genre: state.genre
+  genre: state.genre,
+  login: state.login
 })
 
 const mapDispatchToProps = {getGenreId, postTransaction}

@@ -23,9 +23,11 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import  {connect} from 'react-redux'
 
 import {getUser} from '../redux/actions/user'
+import {logoutAuth} from '../redux/actions/login'
 
 class Users extends Component {
   constructor(props){
@@ -36,7 +38,8 @@ class Users extends Component {
       showNavbar: false,
       pageInfo: {},
       search: '',
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
@@ -56,12 +59,8 @@ class Users extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+    this.props.logoutAuth()
+    this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -90,18 +89,26 @@ class Users extends Component {
 			}
 		})
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
-		this.authCheck()
+		this.checkLogin()
     const param = qs.parse(this.props.location.search.slice(1))
     this.fetchData(param)
   }
@@ -307,6 +314,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {getUser}
+const mapDispatchToProps = {getUser, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Users)

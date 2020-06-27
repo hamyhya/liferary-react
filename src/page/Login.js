@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
 import Logo from '../assets/smeatech.png'
 import swal from 'sweetalert2'
-import axios from 'axios'
-import qs from 'querystring'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
   Link
@@ -19,7 +17,6 @@ class Login extends Component {
       password: ''
     }
     this.loginUser = this.loginUser.bind(this)
-    this.checkLogin = this.checkLogin.bind(this)
   }
 
   handlerChange = (e) =>{
@@ -27,50 +24,35 @@ class Login extends Component {
 	}
   async loginUser (event) {
 		event.preventDefault()
-		const {REACT_APP_URL} = process.env
-		const dataSubmit = {
-      email: this.state.email,
-      password: this.state.password,
-      role: 'user',
-    }
+		const {email, password} = this.state
 
-		const url = `${REACT_APP_URL}users/login`
-		await axios.post(url, qs.stringify(dataSubmit)).then( (response) => {
-				console.log(response);
-          // this.setState( () => {
-          //   localStorage.setItem('token', 'true')
-          //   this.props.history.push('/dashboard-user')
-          // })
-        swal.fire({
-					icon: 'success',
-					title: 'Success',
-					text: 'Login successfully'
-        })
-        if (response.data.token) {
-          const role = {
-            roleName: 'user'
-          }
-          localStorage.setItem('token', JSON.stringify(response.data))
-          localStorage.setItem('role', JSON.stringify(role))
-          this.props.history.push('/dashboard-user')
-        }
-			})
-			.catch(function (error) {
-				swal.fire({
-					icon: 'error',
-					title: 'Hmmm!',
-					text: "Data doesn't match our records"
-				})
-				console.log(error);
-			 })
+    this.props.loginUser(email, password).then((response) => {
+      this.props.history.push('/dashboard-user')
+      swal.fire({
+  			icon: 'success',
+  			title: 'Success',
+  			text: 'Login successfully'
+      })
+    }).catch(function (error) {
+      swal.fire({
+        icon: 'error',
+        title: 'Hmmm!',
+        text: "Data doesn't match our records"
+      })
+    })
   }
   checkLogin = () => {
-    if (localStorage.getItem('token')) {
-      this.props.history.push('/dashboard')
+    if(this.props.login.token !== null){
+      this.props.history.goBack()
+      swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to logout first"
+			})
     }
   }
-  async componentDidMount(){
-    await this.checkLogin()
+  componentDidMount(){
+    this.checkLogin()
 	}
 
   render(){

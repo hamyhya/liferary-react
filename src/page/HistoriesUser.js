@@ -22,31 +22,24 @@ import {Dropdown} from 'react-bootstrap'
 import {
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getHistoryUser} from '../redux/actions/history'
+import {logoutAuth} from '../redux/actions/login'
 
 
 class HistoriesUser extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
     this.state = {
       showAddModal: false,
       showNavbar: false,
       showLogoutModal: false,
       pageInfo: {},
       search: '',
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
@@ -58,12 +51,8 @@ class HistoriesUser extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+		this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -71,14 +60,13 @@ class HistoriesUser extends Component {
 		})
 	}
   fetchData = (params) => {
-		const token = JSON.parse(localStorage.getItem('token'))
     const historiesData = {
-      user: token.name
+      user: this.state.token.name
     }
     const param = `${qs.stringify(params)}`
 		this.props.getHistoryUser(param, historiesData).then( (response) => {
 
-			const pageInfo = this.props.history.pageInfo
+			const pageInfo = this.props._history.pageInfo
 	
 			this.setState({pageInfo})
 			if(param){
@@ -86,14 +74,32 @@ class HistoriesUser extends Component {
 			}
 		})
   }
-  async componentDidMount(){
-		this.checkToken()
+  authCheck = () => {
+		
+    if((this.props.login.token === null)){
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+    } else if (this.state.token.role !== 'user') {
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+		}
+  }
+  componentDidMount(){
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
     this.fetchData(param)
   }
 
   render(){
-    const {dataHistory} = this.props.history
+    const {dataHistory} = this.props._history
 
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
@@ -211,9 +217,10 @@ class HistoriesUser extends Component {
 }
 
 const mapStateToProps = state => ({
-  history: state.history
+  _history: state.history,
+  login: state.login
 })
 
-const mapDispatchToPops = {getHistoryUser}
+const mapDispatchToPops = {getHistoryUser, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToPops)(HistoriesUser)

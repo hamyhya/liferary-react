@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
 import Logo from '../assets/smeatech.png'
 import swal from 'sweetalert2'
-import axios from 'axios'
-import qs from 'querystring'
 import {connect} from 'react-redux'
 import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
@@ -20,7 +18,6 @@ class LoginAdmin extends Component {
       password: ''
     }
     this.LoginAdmin = this.LoginAdmin.bind(this)
-    // this.checkLogin = this.checkLogin.bind(this)
   }
 
   handlerChange = (e) =>{
@@ -28,7 +25,6 @@ class LoginAdmin extends Component {
 	}
   LoginAdmin (event) {
 		event.preventDefault()
-		// const {REACT_APP_URL} = process.env
 		const {email, password} = this.state
 
     this.props.loginAdmin(email, password).then((response) => {
@@ -45,43 +41,16 @@ class LoginAdmin extends Component {
         text: "Data doesn't match our records"
       })
     })
-
-		// const url = `${REACT_APP_URL}employes/login`
-		// await axios.post(url, qs.stringify(dataSubmit)).then( (response) => {
-		// 		console.log(response);
-    //       // this.setState( () => {
-    //       //   localStorage.setItem('token', 'true')
-    //       //   this.props.history.push('/dashboard')
-    //       // })
-    //     swal.fire({
-		// 			icon: 'success',
-		// 			title: 'Success',
-		// 			text: 'Login successfully'
-    //     })
-    //     if (response.data.token) {
-    //       const role = {
-    //         roleName: 'admin'
-    //       }
-    //       localStorage.setItem('token', JSON.stringify(response.data))
-    //       localStorage.setItem('role', JSON.stringify(role))
-    //       this.props.history.push('/dashboard')
-    //     }
-		// 	})
-		// 	.catch(function (error) {
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Hmmm!',
-		// 			text: "Data doesn't match our records"
-		// 		})
-		// 		console.log(error);
-		// 	 })
   }
   checkLogin = () => {
     if(this.props.login.token !== null){
-      this.props.history.push('/dashboard')
+      this.props.history.goBack()
+      swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to logout first"
+			})
     }
-  }
-  componentDidUpdate() {
   }
   componentDidMount(){
    this.checkLogin()

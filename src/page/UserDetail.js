@@ -19,12 +19,13 @@ import {Row,
   NavItem,
   NavLink} from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {deleteUser} from '../redux/actions/user'
+import {logoutAuth} from '../redux/actions/login'
 
 
 class UserDetail extends Component {
@@ -41,7 +42,8 @@ class UserDetail extends Component {
       name: props.location.state.name,
       email: props.location.state.email,
       created_at: props.location.state.created_at,
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.deleteUser = this.deleteUser.bind(this)
     this.toggleAddModal = this.toggleAddModal.bind(this)
@@ -65,12 +67,8 @@ class UserDetail extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+    this.props.logoutAuth()
+    this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -83,7 +81,7 @@ class UserDetail extends Component {
       swal.fire({
         icon: 'success',
         title: 'Success',
-        text: 'Poof! delete genre success'
+        text: 'Poof! delete user success'
       })
       this.props.history.push('/users')
     })
@@ -103,18 +101,26 @@ class UserDetail extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
-		this.authCheck()
+		this.checkLogin()
   }
 
   render(){
@@ -254,6 +260,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {deleteUser}
+const mapDispatchToProps = {deleteUser, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDetail)

@@ -7,8 +7,11 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
 
-class Login extends Component {
+import {register} from '../redux/actions/login'
+
+class Register extends Component {
   constructor(props){
     super(props)
     this.state = {
@@ -16,39 +19,28 @@ class Login extends Component {
       email: '',
       password: ''
     }
-    this.registerUser = this.registerUser.bind(this)
   }
   handlerChange = (e) =>{
 		this.setState({[e.target.name]: e.target.value})
 	}
-  async registerUser (event) {
+  registerUser = (event) => {
 		event.preventDefault()
-		const {REACT_APP_URL} = process.env
-		const dataSubmit = {
-      name: this.state.name,
-      email: this.state.email,
-      password: this.state.password
-    }
+		const {name, email, password} = this.state
 
-		const url = `${REACT_APP_URL}users`
-		await axios.post(url, dataSubmit).then( (response) => {
-				console.log(response);
-				this.setState({showAddModal: false})
-				swal.fire({
-					icon: 'success',
-					title: 'Success',
-					text: 'Register successfully'
-				})
-			})
-			.catch(function (error) {
-				swal.fire({
-					icon: 'error',
-					title: 'Hmmm!',
-					text: "Something's wrong, I can feel it"
-				})
-				console.log(error);
-			 })
-		this.props.history.push(`/login`)
+    this.props.register(name, email, password).then((response) => {
+      this.props.history.push('/login')
+      swal.fire({
+  			icon: 'success',
+  			title: 'Success',
+  			text: 'Register successfully'
+      })
+    }).catch(function (error) {
+      swal.fire({
+        icon: 'error',
+        title: 'Hmmm!',
+        text: "Data already exist"
+      })
+    })
 	}
   async componentDidMount(){
 
@@ -114,4 +106,6 @@ class Login extends Component {
   }
 }
 
-export default Login
+const mapDipatchToProps = {register}
+
+export default connect(null, mapDipatchToProps)(Register)

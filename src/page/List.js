@@ -16,6 +16,7 @@ import {
 	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getBook, postBook} from '../redux/actions/book'
@@ -38,7 +39,8 @@ class List extends Component {
 			author: '',
 			image: '',
 			userId: 0,
-			genreList: []
+			genreList: [],
+			token: jwt.decode(this.props.login.token)
 		}
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleAddModal = this.toggleAddModal.bind(this)
@@ -126,14 +128,22 @@ class List extends Component {
 		})
 	}
 	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
 	componentDidMount(){
 		const param = qs.parse(this.props.location.search.slice(1))

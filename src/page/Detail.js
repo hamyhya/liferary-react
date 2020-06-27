@@ -9,6 +9,7 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {deleteBook, patchBook} from '../redux/actions/book'
@@ -29,7 +30,8 @@ class Detail extends Component {
       picture: props.location.state.picture,
       user_id: 0,
       employee_id: 0,
-      genreName: ''
+      genreName: '',
+      token: jwt.decode(this.props.login.token)
     }
     this.deleteBook = this.deleteBook.bind(this)
     this.updateBook = this.updateBook.bind(this)
@@ -103,18 +105,26 @@ class Detail extends Component {
   genreList = () => {
 		this.props.getGenre()
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
 	componentDidMount(){
-		this.authCheck()
+		this.checkLogin()
     this.fetchData()
     this.genreList()
 	}

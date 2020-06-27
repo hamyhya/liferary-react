@@ -23,31 +23,24 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getTransaction} from '../redux/actions/transaction'
+import {logoutAuth} from '../redux/actions/login'
 
 
 class Transactions extends Component {
   constructor(props){
     super(props)
-    // this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showAddModal: false,
       showNavbar: false,
       showLogoutModal: false,
       pageInfo: {},
       search: '',
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.toggleAddModal = this.toggleAddModal.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
@@ -67,12 +60,8 @@ class Transactions extends Component {
 		})
 	}
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+    this.props.logoutAuth()
+    this.props.history.push('/')
   }
   toggleAddModal(){
     this.setState({
@@ -101,18 +90,26 @@ class Transactions extends Component {
 			}
 		})
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
-		this.authCheck()
+		this.checkLogin()
     const param = qs.parse(this.props.location.search.slice(1))
     this.fetchData(param)
   }
@@ -324,6 +321,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {getTransaction}
+const mapDispatchToProps = {getTransaction, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Transactions)

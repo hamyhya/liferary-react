@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
@@ -16,9 +15,11 @@ import {
 	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getBook} from '../redux/actions/book'
+import {logoutAuth} from '../redux/actions/login'
 
 
 
@@ -38,33 +39,12 @@ class ListUsers extends Component {
 			author: '',
 			image: '',
 			userId: 0,
-			genreList: []
+			genreList: [],
+			token: jwt.decode(this.props.login.token)
 		}
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-		this.authCheck = this.authCheck.bind(this)
-	}
-	authCheck = () => {
-		const token = JSON.parse(localStorage.getItem('token'))
-		const role = JSON.parse(localStorage.getItem('role'))
-		if(role.roleName === 'user'){
-			if(!localStorage.getItem('token')){
-				this.props.history.push('/login')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-			}
-		} else {
-			this.props.history.push('/login')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login as user'
-				})
-		}
 	}
 	toggleLogoutModal(){
 		this.setState({
@@ -77,12 +57,8 @@ class ListUsers extends Component {
 		})
 	}
 	logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+		this.props.history.push('/')
 	}
 	fetchData = (params) => {
 		const param = `${qs.stringify(params)}`
@@ -96,6 +72,24 @@ class ListUsers extends Component {
 			}
 		})
 	}
+	authCheck = () => {
+		
+    if((this.props.login.token === null)){
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+    } else if (this.state.token.role !== 'user') {
+			this.props.history.goback()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as user first"
+			})
+		}
+  }
 	componentDidMount(){
 		const param = qs.parse(this.props.location.search.slice(1))
 		this.fetchData(param)
@@ -256,9 +250,10 @@ class ListUsers extends Component {
 }
 
 const mapStateToProps = state => ({
-	book: state.book
+	book: state.book,
+	login: state.login
 })
 
-const mapDispatchToProps = {getBook}
+const mapDispatchToProps = {getBook, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListUsers)

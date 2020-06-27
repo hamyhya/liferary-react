@@ -13,9 +13,11 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {deleteAdmin, patchAdmin} from '../redux/actions/admin'
+import {logoutAuth} from '../redux/actions/login'
 
 class AdministratorsDetail extends Component {
   constructor(props){
@@ -30,7 +32,8 @@ class AdministratorsDetail extends Component {
       name: props.location.state.name,
       email: props.location.state.email,
       password: props.location.state.password,
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.handlerUpdate = this.handlerUpdate.bind(this)
     this.deleteAdmin = this.deleteAdmin.bind(this)
@@ -54,12 +57,8 @@ class AdministratorsDetail extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+		this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -120,17 +119,25 @@ deleteAdmin(){
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  checkLogin = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
-  async componentDidMount(){
+  componentDidMount(){
   this.checkLogin()
   }
 
@@ -249,6 +256,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {deleteAdmin, patchAdmin}
+const mapDispatchToProps = {deleteAdmin, patchAdmin, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdministratorsDetail)

@@ -22,10 +22,12 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {deleteTransaction, penaltyTransaction, accTransaction} from '../redux/actions/transaction'
 import {postHistory} from '../redux/actions/history'
+import {logoutAuth} from '../redux/actions/login'
 
 class TransactionDetail extends Component {
   constructor(props){
@@ -45,7 +47,8 @@ class TransactionDetail extends Component {
       employee: props.location.state.employee,
       status: props.location.state.status,
       created_at: props.location.state.created_at,
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.setPenalty = this.setPenalty.bind(this)
     this.setAcc = this.setAcc.bind(this)
@@ -69,12 +72,8 @@ class TransactionDetail extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+    this.props.logoutAuth()
+    this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -119,12 +118,11 @@ class TransactionDetail extends Component {
   }
   setAcc(){
     const {id} = this.state
-		const token = JSON.parse(localStorage.getItem('token'))
     const dataSubmit = {
-      employee_id: 8 //token.id
+      employee_id: this.state.token.id
     }
     this.props.accTransaction(id, dataSubmit)
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.setState({showAccModal: !this.state.showAccModal})
     this.props.history.push('/transactions')
     swal.fire({
       icon: 'success',
@@ -135,7 +133,7 @@ class TransactionDetail extends Component {
   setPenalty(){
     const {id} = this.state
     this.props.penaltyTransaction(id)
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
+    this.setState({showPenaltyModal: !this.state.showPenaltyModal})
     this.props.history.push('/transactions')
     swal.fire({
       icon: 'success',
@@ -158,18 +156,26 @@ class TransactionDetail extends Component {
       showAccModal: !this.state.showAccModal
     })
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
-	  this.authCheck()
+	  this.checkLogin()
   }
 
   render(){
@@ -275,23 +281,6 @@ class TransactionDetail extends Component {
           </ModalFooter>
           </Form>
         </Modal>
-        
-         {/* Edit Modal */}
-         <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Admin</ModalHeader>
-          <ModalBody>
-            <h6>Name</h6>
-            <Input name='name' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.name}/>
-            <h6>Email</h6>
-            <Input name='email' type='text' className='mb-2' onChange={this.handlerChange} value={this.state.email}/>
-            <h6>Password</h6>
-            <Input name='password' type='password' className='mb-2' onChange={this.handlerChange} value={this.state.password}/>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick={this.handlerUpdate}>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
 
          {/* Delete Modal */}
          <Modal isOpen={this.state.showDeleteModal}>
@@ -334,14 +323,15 @@ class TransactionDetail extends Component {
 }
 
 const mapStateToProps = state => ({
-  loginL: state.login
+  login: state.login
 })
 
 const mapDispatchToProps = {
   deleteTransaction, 
   penaltyTransaction, 
   accTransaction,
-  postHistory
+  postHistory,
+  logoutAuth
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TransactionDetail)

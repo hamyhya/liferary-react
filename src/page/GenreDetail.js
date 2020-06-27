@@ -12,9 +12,11 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {patchGenre, deleteGenre} from '../redux/actions/genre'
+import {logoutAuth} from '../redux/actions/login'
 
 class GenreDetail extends Component {
   constructor(props){
@@ -30,7 +32,8 @@ class GenreDetail extends Component {
       name: props.location.state.name,
       email: props.location.state.email,
       password: props.location.state.password,
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.handlerUpdate = this.handlerUpdate.bind(this)
     this.deleteGenre = this.deleteGenre.bind(this)
@@ -55,15 +58,11 @@ class GenreDetail extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+    this.props.history.push('/')
   }
   toggleLogoutModal(){
-		this.setState({
+    this.setState({
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
@@ -124,15 +123,23 @@ deleteGenre(){
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
     this.authCheck()
@@ -249,6 +256,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {patchGenre, deleteGenre}
+const mapDispatchToProps = {patchGenre, deleteGenre, logoutAuth}
 
 export default connect (mapStateToProps, mapDispatchToProps)(GenreDetail)

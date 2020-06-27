@@ -24,9 +24,11 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getHistory, deleteHistory} from '../redux/actions/history'
+import {logoutAuth} from '../redux/actions/login'
 
 
 class Histories extends Component {
@@ -38,7 +40,8 @@ class Histories extends Component {
       showLogoutModal: false,
       pageInfo: {},
       search: '',
-      data: []
+      data: [],
+      token: jwt.decode(this.props.login.token)
     }
     this.deleteHistory = this.deleteHistory.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
@@ -57,12 +60,8 @@ class Histories extends Component {
 		})
   }
   logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+		this.props.history.push('/')
   }
   toggleLogoutModal(){
 		this.setState({
@@ -99,18 +98,26 @@ class Histories extends Component {
 			}
 		})
   }
-  authCheck = () => {
+	checkLogin = () => {
+		
     if((this.props.login.token === null)){
-			this.props.history.push('/admin')
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
-				text: "You've to login first"
+				text: "You've to login as admin first"
 			})
-    }
+    } else if (this.state.token.role !== 'admin') {
+			this.props.history.goBack()
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login as admin first"
+			})
+		}
   }
   componentDidMount(){
-		this.authCheck()
+		this.checkLogin()
     const param = qs.parse(this.props.location.search.slice(1))
     this.fetchData(param)
   }
@@ -272,6 +279,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {getHistory, deleteHistory}
+const mapDispatchToProps = {getHistory, deleteHistory, logoutAuth}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Histories)
