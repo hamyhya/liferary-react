@@ -52,7 +52,7 @@ class LandingPage extends Component {
             <div className='landing-nav'>
             <Navbar className="navbar justify-content-between">
               <div className='container'>
-                <a class="navbar-brand text-white " href="#">Liferary</a>
+                <a className="navbar-brand text-white " href="#">Liferary</a>
                 <Form className="form-inline">
                   <Link to='/login'><button className="btn btn-outline-light my-2 my-sm-0" data-toggle data-target='#content' type="submit">Login</button></Link>
                 </Form>

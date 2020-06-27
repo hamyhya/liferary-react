@@ -24,21 +24,14 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {getHistory, deleteHistory} from '../redux/actions/history'
 
 
 class Histories extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
     this.state = {
       showAddModal: false,
       showNavbar: false,
@@ -82,36 +75,49 @@ class Histories extends Component {
     })
   }
   deleteHistory(){
-    const {REACT_APP_URL} = process.env
-    axios.delete(`${REACT_APP_URL}histories`)
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
-    this.props.history.push('/dashboard')
-    swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: 'Cling! History cleared'
+    this.props.deleteHistory().then((response) => {
+      this.setState({
+        showDeleteModal: !this.state.showDeleteModal
+      })
+      swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Poof! history cleared'
+      })
     })
+    this.props.history.push('/histories')
   }
-  fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
+  fetchData = (params) => {
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}histories?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
+		this.props.getHistory(param).then( (response) => {
+
+			const pageInfo = this.props._history.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
+  }
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
     }
   }
-  async componentDidMount(){
-		this.checkToken()
+  componentDidMount(){
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.fetchData(param)
   }
 
   render(){
+    const {dataHistory, isLoading} = this.props._history
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.search = params.search || ''
@@ -151,75 +157,85 @@ class Histories extends Component {
                 </Collapse>
               </Navbar>
           </Col>
-          <Col className='mt-5'>
-            <div className='d-flex justify-content-between container'>
-              <div className='mt-5'>
-                <h4>List Histories</h4>
+          {isLoading ? (
+            <center className='mt-5'>
+              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span class="sr-only">Loading...</span>
               </div>
-              <div className='mt-5'>
-                <Button className='btn btn-danger' onClick={this.toggleDeleteModal}>Clear History</Button>
-              </div>
+            </center>
+          ):(
+            <div>
+              <Col className='mt-5'>
+                <div className='d-flex justify-content-between container'>
+                  <div className='mt-5'>
+                    <h4>List Histories</h4>
+                  </div>
+                  <div className='mt-5'>
+                    <Button className='btn btn-danger' onClick={this.toggleDeleteModal}>Clear History</Button>
+                  </div>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='container'>
+                  <Dropdown className="mb-4 ml-2">
+                    <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                      Sort By
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </Col>
+              <Col className='mt-1'>
+                <div className='container'>
+                <Table bordered className='mt-2'>
+                        <thead>
+                          <tr>
+                            <th>No</th>
+                            <th>Transaction ID</th>
+                            <th>Title</th>
+                            <th>User</th>
+                            <th>Employee</th>
+                            <th>Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {dataHistory.map((history, index) => (
+                          <tr>
+                            <th scope="row">{history.id}</th>
+                            <td>{history.transaction_id}</td>
+                            <td>{history.title}</td>
+                            <td>{history.user}</td>
+                            <td>{history.employee}</td>
+                            <td>{history.date}</td>
+                          </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+                  <div>
+                    {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                    
+                  </div>
+                  <div>
+                    {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                      return (
+                      <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                  </div>
+                </div>
+              </Col>
             </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='container'>
-              <Dropdown className="mb-4 ml-2">
-                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                  Sort By
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-          <Col className='mt-1'>
-            <div className='container'>
-            <Table bordered className='mt-2'>
-                    <thead>
-                      <tr>
-                        <th>No</th>
-                        <th>Transaction ID</th>
-                        <th>Title</th>
-                        <th>User</th>
-                        <th>Employee</th>
-                        <th>Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.state.data.map((history, index) => (
-                      <tr>
-                        <th scope="row">{history.id}</th>
-                        <td>{history.transaction_id}</td>
-                        <td>{history.title}</td>
-                        <td>{history.user}</td>
-                        <td>{history.employee}</td>
-                        <td>{history.date}</td>
-                      </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-            </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-              <div>
-                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                
-              </div>
-              <div>
-                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                  return (
-                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                  )
-                })}
-              </div>
-              <div>
-                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-              </div>
-            </div>
-          </Col>
+          )}
         </Row>
         <Row className='w-100 '>
           <Col className='mt-5 w-100'>
@@ -251,4 +267,11 @@ class Histories extends Component {
   }
 }
 
-export default Histories
+const mapStateToProps = state => ({
+  _history: state.history,
+  login: state.login
+})
+
+const mapDispatchToProps = {getHistory, deleteHistory}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Histories)

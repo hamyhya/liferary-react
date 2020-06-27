@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -31,16 +30,6 @@ import {getUser} from '../redux/actions/user'
 class Users extends Component {
   constructor(props){
     super(props)
-    // this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showAddModal: false,
       showLogoutModal: false,
@@ -89,7 +78,7 @@ class Users extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  fetchData = async (params) => {
+  fetchData = (params) => {
     const param = `${qs.stringify(params)}`
 		this.props.getUser(param).then( (response) => {
 
@@ -101,10 +90,20 @@ class Users extends Component {
 			}
 		})
   }
-  async componentDidMount(){
-		// this.checkToken()
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
+  componentDidMount(){
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.fetchData(param)
   }
 
   render(){
@@ -304,7 +303,8 @@ class Users extends Component {
 }
 
 const mapStateToProps = state => ({
-  user: state.user
+  user: state.user,
+  login: state.login
 })
 
 const mapDispatchToProps = {getUser}

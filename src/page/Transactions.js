@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -24,21 +23,24 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {getTransaction} from '../redux/actions/transaction'
 
 
 class Transactions extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
+    // this.checkToken = () => {
+    //   if(!localStorage.getItem('token')){
+		// 		props.history.push('/admin')
+		// 		swal.fire({
+		// 			icon: 'error',
+		// 			title: 'Nooooo!',
+		// 			text: 'You have to login first'
+		// 		})
+    //   }
+    // }
     this.state = {
       showAddModal: false,
       showNavbar: false,
@@ -87,26 +89,37 @@ class Transactions extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
+  fetchData = (params) => {
     const param = `${qs.stringify(params)}`
-    const url = `${REACT_APP_URL}transactions?${param}`
-    const results = await axios.get(url)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
+		this.props.getTransaction(param).then( (response) => {
+
+			const pageInfo = this.props.transaction.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
+  }
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
     }
   }
-  async componentDidMount(){
-		this.checkToken()
+  componentDidMount(){
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.fetchData(param)
   }
 
   render(){
+    const {dataTransaction, isLoading} = this.props.transaction
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.search = params.search || ''
@@ -146,87 +159,97 @@ class Transactions extends Component {
                 </Collapse>
               </Navbar>
           </Col>
-          <Col className='mt-5'>
-            <div className='d-flex justify-content-between container'>
-              <div className='mt-5'>
-                <h4>List Transactions</h4>
+          {isLoading ? (
+            <center className='mt-5'>
+              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span class="sr-only">Loading...</span>
               </div>
+            </center>
+          ):(
+            <div>
+              <Col className='mt-5'>
+                <div className='d-flex justify-content-between container'>
+                  <div className='mt-5'>
+                    <h4>List Transactions</h4>
+                  </div>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='container'>
+                  <Dropdown className="mb-4 ml-2">
+                    <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
+                      Sort By
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
+              </Col>
+              <Col className='mt-1'>
+                <div className='container'>
+                  <Table bordered className='mt-2'>
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Book</th>
+                        <th>User</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dataTransaction.map((transactions, index) => (
+                      <tr>
+                        <th scope="row">{transactions.id}</th>
+                        <td>{transactions.title}</td>
+                        <td>{transactions.user}</td>
+                        <td>{transactions.employee}</td>
+                        <td>{transactions.status}</td>
+                        <td>{transactions.created_at}</td>
+                        <td>
+                        <h6>
+                          <Link to={{
+                              pathname: `/transactions-detail/${transactions.id}`,
+                              state: {
+                                id: `${transactions.id}`,
+                                title: `${transactions.title}`,
+                                user: `${transactions.user}`,
+                                employee: `${transactions.employee}`,
+                                status: `${transactions.status}`,
+                                created_at: `${transactions.created_at}`
+                              }
+                            }}><a>More...</a></Link></h6>
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+              <Col className='mt-5'>
+                <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
+                  <div>
+                    {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
+                    
+                  </div>
+                  <div>
+                    {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
+                      return (
+                      <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
+                      )
+                    })}
+                  </div>
+                  <div>
+                    <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
+                  </div>
+                </div>
+              </Col>
             </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='container'>
-              <Dropdown className="mb-4 ml-2">
-                <Dropdown.Toggle className='btn-sort' id="dropdown-basic">
-                  Sort By
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 0 })}>Ascending</Dropdown.Item>
-                  <Dropdown.Item onClick={() => this.fetchData({ ...params, sort: 1 })}>Descending</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </Col>
-          <Col className='mt-1'>
-            <div className='container'>
-              <Table bordered className='mt-2'>
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Book</th>
-                    <th>User</th>
-                    <th>Employee</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.data.map((transactions, index) => (
-                  <tr>
-                    <th scope="row">{transactions.id}</th>
-                    <td>{transactions.title}</td>
-                    <td>{transactions.user}</td>
-                    <td>{transactions.employee}</td>
-                    <td>{transactions.status}</td>
-                    <td>{transactions.created_at}</td>
-                    <td>
-                    <h6>
-                      <Link to={{
-                          pathname: `/transactions-detail/${transactions.id}`,
-                          state: {
-                            id: `${transactions.id}`,
-                            title: `${transactions.title}`,
-                            user: `${transactions.user}`,
-                            employee: `${transactions.employee}`,
-                            status: `${transactions.status}`,
-                            created_at: `${transactions.created_at}`
-                          }
-                        }}><a>More...</a></Link></h6>
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          </Col>
-          <Col className='mt-5'>
-            <div className='mb-5 pagination-btn d-flex flex-row justify-content-between container'>
-              <div>
-                {<Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)-1})}>Prev</Button>}
-                
-              </div>
-              <div>
-                {[...Array(this.state.pageInfo.totalPage)].map((o, i)=>{
-                  return (
-                  <Button onClick={()=>this.fetchData({...params, page: params.page? i+1 : i+1})} className='mr-1 ml-1' key={i.toString()}>{i+1}</Button>
-                  )
-                })}
-              </div>
-              <div>
-                <Button onClick={()=>this.fetchData({...params, page: parseInt(params.page)+1})}>Next</Button>
-              </div>
-            </div>
-          </Col>
+          )}
         </Row>
         <Row className='w-100 '>
           <Col className='mt-5 w-100'>
@@ -296,4 +319,11 @@ class Transactions extends Component {
   }
 }
 
-export default Transactions
+const mapStateToProps = state => ({
+  transaction: state.transaction,
+  login: state.login
+})
+
+const mapDispatchToProps = {getTransaction}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Transactions)

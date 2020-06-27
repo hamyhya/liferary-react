@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -21,9 +20,11 @@ import {Row,
   NavLink} from 'reactstrap'
 import {Dropdown} from 'react-bootstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {getHistoryUser} from '../redux/actions/history'
 
 
 class HistoriesUser extends Component {
@@ -47,16 +48,9 @@ class HistoriesUser extends Component {
       search: '',
       data: []
     }
-    this.deleteHistory = this.deleteHistory.bind(this)
 		this.toggleNavbar = this.toggleNavbar.bind(this)
 		this.toggleLogoutModal = this.toggleLogoutModal.bind(this)
 		this.logoutAuth = this.logoutAuth.bind(this)
-    this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
-  }
-  toggleNavbar(){
-		this.setState({
-			showNavbar: !this.state.showNavbar
-		})
   }
   toggleNavbar(){
 		this.setState({
@@ -76,46 +70,31 @@ class HistoriesUser extends Component {
 			showLogoutModal: !this.state.showLogoutModal
 		})
 	}
-  toggleDeleteModal(){
-    this.setState({
-      showDeleteModal: !this.state.showDeleteModal
-    })
-  }
-  deleteHistory(){
-    const {REACT_APP_URL} = process.env
-    axios.delete(`${REACT_APP_URL}histories`)
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
-    this.props.history.push('/dashboard')
-    swal.fire({
-      icon: 'success',
-      title: 'Success',
-      text: 'Cling! History cleared'
-    })
-  }
-  fetchData = async (params) => {
-    this.setState({isLoading: true})
-    const {REACT_APP_URL} = process.env
-    const param = `${qs.stringify(params)}`
+  fetchData = (params) => {
 		const token = JSON.parse(localStorage.getItem('token'))
     const historiesData = {
       user: token.name
     }
-    const url = `${REACT_APP_URL}histories/user?${param}`
-    const results = await axios.post(url, historiesData)
-    const {data} = results.data
-    const pageInfo = results.data.pageInfo
-    this.setState({data, pageInfo, isLoading: false})
-    if(params){
-      this.props.history.push(`?${param}`)
-    }
+    const param = `${qs.stringify(params)}`
+		this.props.getHistoryUser(param, historiesData).then( (response) => {
+
+			const pageInfo = this.props.history.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
   }
   async componentDidMount(){
 		this.checkToken()
     const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.fetchData(param)
   }
 
   render(){
+    const {dataHistory} = this.props.history
+
     const params = qs.parse(this.props.location.search.slice(1))
     params.page = params.page || 1
     params.search = params.search || ''
@@ -177,7 +156,7 @@ class HistoriesUser extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {this.state.data.map((history, index) => (
+                      {dataHistory.map((history, index) => (
                       <tr>
                         <th scope="row">{history.id}</th>
                         <td>{history.transaction_id}</td>
@@ -218,15 +197,6 @@ class HistoriesUser extends Component {
           </Col>
         </Row>
 
-         {/* Delete Modal */}
-         <Modal isOpen={this.state.showDeleteModal}>
-            <ModalBody className='h4'>Are you sure?</ModalBody>
-            <ModalFooter>
-              <Button color='danger' onClick={this.deleteHistory}>Clear History</Button>
-              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-
           {/* Logout Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>
           <ModalBody className='h4'>Are you sure?</ModalBody>
@@ -240,4 +210,10 @@ class HistoriesUser extends Component {
   }
 }
 
-export default HistoriesUser
+const mapStateToProps = state => ({
+  history: state.history
+})
+
+const mapDispatchToPops = {getHistoryUser}
+
+export default connect(mapStateToProps, mapDispatchToPops)(HistoriesUser)

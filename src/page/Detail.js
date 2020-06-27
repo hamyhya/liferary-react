@@ -12,20 +12,11 @@ import {
 import {connect} from 'react-redux'
 
 import {deleteBook, patchBook} from '../redux/actions/book'
+import {getGenre, getGenreId} from '../redux/actions/genre'
 
 class Detail extends Component {
   constructor(props){
     super(props)
-    // this.authCheck = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showEditModal: false,
       showDeleteModal: false,
@@ -38,59 +29,19 @@ class Detail extends Component {
       picture: props.location.state.picture,
       user_id: 0,
       employee_id: 0,
-      genreName: '',
-      genreList: [],
-      adminList: []
+      genreName: ''
     }
     this.deleteBook = this.deleteBook.bind(this)
     this.updateBook = this.updateBook.bind(this)
-    this.borrowBook = this.borrowBook.bind(this)
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
-    this.toggleBorrowModal = this.toggleBorrowModal.bind(this)
     this.genreChange = this.genreChange.bind(this)
-  }
-  home = (e) =>{
-    e.preventDefault()
-    
-    this.props.history.push('/')
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
   genreChange = (e) => {
     this.setState({ genre : e.value })
-  }
-  borrowBook = (event) => {
-    event.preventDefault()
-    this.setState({isLoading: true})
-    const authorData = {
-        book_id: this.state.id,
-        user_id: this.state.user_id,
-        employee_id: this.state.employee_id
-    }
-    
-    console.log(authorData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}transactions`
-    axios.post(url, authorData).then( (response) => {
-        console.log(response) 
-        this.setState({ showBorrowModal: !this.state.showBorrowModal })
-        swal.fire({
-         icon: 'success',
-         title: 'Success',
-         text: 'Yay! borrow book success'
-       })
-      })
-      .catch(function (error) {
-        console.log(error.response)
-        swal.fire({
-					icon: 'error',
-					title: 'Oops!',
-					text: "Book has been booked right now"
-				})
-       })
-       this.props.history.push('/dashboard')
   }
   toggleEditModal(){
     this.setState({
@@ -100,11 +51,6 @@ class Detail extends Component {
   toggleDeleteModal(){
     this.setState({
       showDeleteModal: !this.state.showDeleteModal
-    })
-  }
-  toggleBorrowModal(){
-    this.setState({
-      showBorrowModal: !this.state.showBorrowModal
     })
   }
   deleteBook(){
@@ -117,15 +63,6 @@ class Detail extends Component {
       })
       this.props.history.push('/dashboard')
     })
-
-    // const {REACT_APP_URL} = process.env
-    // await axios.delete(`${REACT_APP_URL}books/${this.state.id}`)
-    // swal.fire({
-    //   icon: 'success',
-    //   title: 'Success',
-    //   text: 'Poof! delete success'
-    // })
-    // this.props.history.push('/dashboard')
   }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
@@ -159,37 +96,30 @@ class Detail extends Component {
         text: "Good! Update successfully"
       })
   }
-  fetchData = async () => {
-		this.setState({isLoading: true})
-		const {REACT_APP_URL} = process.env
-		const url = `${REACT_APP_URL}genres/${this.state.genre}`
-		const results = await axios.get(url)
-    const {data} = results.data
-    return data
+  fetchData = () => {
+		const {genre} = this.state
+		this.props.getGenreId(genre)
   }
-  genreList = async () => {
-		this.setState({isLoading: true})
-		const {REACT_APP_URL} = process.env
-		const url = `${REACT_APP_URL}genres`
-		const results = await axios.get(url)
-    this.setState({genreList: results.data.data})
+  genreList = () => {
+		this.props.getGenre()
   }
-  adminList = async () => {
-		this.setState({isLoading: true})
-		const {REACT_APP_URL} = process.env
-		const url = `${REACT_APP_URL}employes`
-		const results = await axios.get(url)
-    this.setState({adminList: results.data.data})
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
   }
-  
-	async componentDidMount(){
-		// this.authCheck()
-    const data = await this.fetchData()
-    await this.genreList()
-    await this.adminList()
-    this.setState({genreName: data.name})
+	componentDidMount(){
+		this.authCheck()
+    this.fetchData()
+    this.genreList()
 	}
   render(){
+    const {dataGenre, dataGenreId} = this.props.genre 
     return(
       <>
         <div className="details">
@@ -209,7 +139,7 @@ class Detail extends Component {
           </div>
           <div className="book-details container">
             <div className="tag">
-              <h4><span class="badge badge-detail text-white">{this.state.genreName}</span></h4>
+              <h4><span class="badge badge-detail text-white">{dataGenreId}</span></h4>
               
               </div>
             <Row>
@@ -249,7 +179,7 @@ class Detail extends Component {
                     ))}
                   </Input>  */}
                   <Select onChange={this.genreChange} options={
-                    this.state.genreList.map((genre) =>(
+                    dataGenre.map((genre) =>(
                       { value: genre.id, label: genre.name}
                       ))
                   } value={this.state.genre}/>
@@ -276,6 +206,11 @@ class Detail extends Component {
   }
 }
 
-const mapDispatchToProps = {deleteBook, patchBook}
+const mapStateToProps = state => ({
+  genre: state.genre,
+  login: state.login
+})
 
-export default connect(null, mapDispatchToProps)(Detail)
+const mapDispatchToProps = {deleteBook, patchBook, getGenre, getGenreId}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Detail)

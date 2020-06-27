@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Form, Button, Modal, ModalBody, 
@@ -20,16 +19,6 @@ import {patchGenre, deleteGenre} from '../redux/actions/genre'
 class GenreDetail extends Component {
   constructor(props){
     super(props)
-    // this.authCheck = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showAddModal: false,
       showSuccessModal: false,
@@ -135,8 +124,18 @@ deleteGenre(){
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  async componentDidMount(){
-    // this.authCheck()
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
+  componentDidMount(){
+    this.authCheck()
   }
 
   render(){
@@ -246,6 +245,10 @@ deleteGenre(){
   }
 }
 
+const mapStateToProps = state => ({
+  login: state.login
+})
+
 const mapDispatchToProps = {patchGenre, deleteGenre}
 
-export default connect (null, mapDispatchToProps)(GenreDetail)
+export default connect (mapStateToProps, mapDispatchToProps)(GenreDetail)

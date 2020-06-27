@@ -7,6 +7,9 @@ import {Row, Col, Form, FormGroup, Input, Label, Button} from 'reactstrap'
 import {
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {loginUser} from '../redux/actions/login'
 
 class Login extends Component {
   constructor(props){
@@ -107,7 +110,7 @@ class Login extends Component {
                         <span>Remember Me</span>
                       </Label>
                     </FormGroup>
-                    <div><a href='#'><Link to='/admin'>Administrator</Link></a></div>
+                    <div><a href=''><Link to='/admin'>Administrator</Link></a></div>
                   </div>
                   <div className='mt-4'>
                     <Button className='btn right-btn' type='submit'>Login</Button>
@@ -115,7 +118,7 @@ class Login extends Component {
                   </div>
                   <div className='d-flex flex-column mt-5'>
                     <div>By signing up, you agree to Liferary’s</div>
-                    <div> <a href='#'>Terms and Conditions</a> &amp; <a href='#'>Privacy Policy</a></div>
+                    <div> <a href='/tnc'>Terms and Conditions</a> &amp; <a href='/pp'>Privacy Policy</a></div>
                   </div>
                 </Form>
               </div>
@@ -127,4 +130,10 @@ class Login extends Component {
   }
 }
 
-export default Login
+const mapStateToProps = state => ({
+  login: state.login
+})
+
+const mapDispatchToProps = {loginUser}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

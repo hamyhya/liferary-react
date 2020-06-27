@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -31,16 +30,6 @@ import {deleteUser} from '../redux/actions/user'
 class UserDetail extends Component {
   constructor(props){
     super(props)
-    // this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showAddModal: false,
       showSuccessModal: false,
@@ -114,8 +103,18 @@ class UserDetail extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  async componentDidMount(){
-		// this.checkToken()
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
+  componentDidMount(){
+		this.authCheck()
   }
 
   render(){
@@ -251,6 +250,10 @@ class UserDetail extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  login: state.login
+})
+
 const mapDispatchToProps = {deleteUser}
 
-export default connect(null, mapDispatchToProps)(UserDetail)
+export default connect(mapStateToProps, mapDispatchToProps)(UserDetail)

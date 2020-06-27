@@ -20,16 +20,6 @@ import {deleteAdmin, patchAdmin} from '../redux/actions/admin'
 class AdministratorsDetail extends Component {
   constructor(props){
     super(props)
-    // this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showSuccessModal: false,
       showLogoutModal: false,
@@ -130,8 +120,18 @@ deleteAdmin(){
       showDeleteModal: !this.state.showDeleteModal
     })
   }
+  checkLogin = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
   async componentDidMount(){
-  //  this.checkToken()
+  this.checkLogin()
   }
 
   render(){
@@ -245,6 +245,10 @@ deleteAdmin(){
   }
 }
 
+const mapStateToProps = state => ({
+  login: state.login
+})
+
 const mapDispatchToProps = {deleteAdmin, patchAdmin}
 
-export default connect(null, mapDispatchToProps)(AdministratorsDetail)
+export default connect(mapStateToProps, mapDispatchToProps)(AdministratorsDetail)

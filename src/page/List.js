@@ -1,5 +1,4 @@
 import React, {Component, useState} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import Token from '../services/Token'
@@ -20,21 +19,12 @@ import {
 import {connect} from 'react-redux'
 
 import {getBook, postBook} from '../redux/actions/book'
+import {getGenre} from '../redux/actions/genre'
+import {logoutAuth} from '../redux/actions/login'
 
 class List extends Component {
 	constructor(props){
 		super(props)
-		// const token = JSON.parse(localStorage.getItem('token'))
-		// this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
 		this.state = {
 			showAddModal: false,
 			showLogoutModal: false,
@@ -79,12 +69,8 @@ class List extends Component {
 		})
 	}
 	logoutAuth = () => {
-		this.setState({isLoading: true},()=>{
-				this.setState({isLoading: false}, ()=>{
-					localStorage.removeItem('token')
-						this.props.history.push('/')
-				})
-		})
+		this.props.logoutAuth()
+		this.props.history.push('/')
 	}
 	addBook (event) {
 		event.preventDefault()
@@ -128,25 +114,38 @@ class List extends Component {
 		})
 	}
 	genreList = async () => {
-		this.setState({isLoading: true})
-		const {REACT_APP_URL} = process.env
-		const url = `${REACT_APP_URL}genres`
-		const results = await axios.get(url)
-		this.setState({genreList: results.data.data})
+		const param = ''
+		this.props.getGenre(param).then( (response) => {
+
+			const pageInfo = this.props.genre.pageInfo
+	
+			this.setState({pageInfo})
+			if(param){
+					this.props.history.push(`?${param}`)
+			}
+		})
+	}
+	checkLogin = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
   }
-	async componentDidMount(){
-	//  if(this.props.login.token === null) {
-	//  	this.props.history.push('/admin')
-	//  }
+	componentDidMount(){
 		const param = qs.parse(this.props.location.search.slice(1))
-		await this.fetchData(param)
-		// this.checkToken()
-		await this.genreList()
+		this.fetchData(param)
+		this.checkLogin()
+		this.genreList()
 	}
 	
 
 	render(){
-		const {dataBook, isLoading, pageInfo} = this.props.book
+		const {dataBook, isLoading} = this.props.book
+		const {dataGenre} = this.props.genre
 		
 		const params = qs.parse(this.props.location.search.slice(1))
 		params.page = params.page || 1
@@ -163,19 +162,19 @@ class List extends Component {
 						<Collapse isOpen={this.state.showNavbar} navbar>
 							<Nav className="mr-auto" navbar>
 								<NavItem>
-									<Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+									<Link className='nav-link text-white' to='/transactions'>Transactions</Link>
 								</NavItem>
 								<NavItem>
-									<Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+									<Link className='nav-link text-white' to='/histories'>Histories</Link>
 								</NavItem>
 								<NavItem>
-									<Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+									<Link className='nav-link text-white' to='/administrators'>Administrators</Link>
 								</NavItem>
 								<NavItem>
-									<Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+									<Link className='nav-link text-white' to='/users'>Users</Link>
 								</NavItem>
                 <NavItem>
-                  <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                  <Link className='nav-link text-white' to='/genres'>Genres</Link>
                 </NavItem>
 							</Nav>
 								<span className="navbar-text">
@@ -319,7 +318,7 @@ class List extends Component {
                   </Input>  */}
 									{/* REACT-SELECT */}
 									<Select onChange={this.genreChange} options={
-										this.state.genreList.map((genre) =>(
+										dataGenre.map((genre) =>(
 											{ value: genre.id, label: genre.name}
 											))
 									}/> 
@@ -349,8 +348,9 @@ class List extends Component {
 const mapStateToProps = state => ({
 	book: state.book,
 	login: state.login,
+	genre: state.genre
 })
 
-const mapDispatchToProps = { getBook, postBook }
+const mapDispatchToProps = { getBook, postBook, getGenre, logoutAuth }
 
 export default connect(mapStateToProps, mapDispatchToProps)(List)

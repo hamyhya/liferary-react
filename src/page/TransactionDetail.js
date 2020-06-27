@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -23,20 +22,14 @@ import {
   BrowserRouter as Router,
   Link
 } from "react-router-dom";
+import {connect} from 'react-redux'
+
+import {deleteTransaction, penaltyTransaction, accTransaction} from '../redux/actions/transaction'
+import {postHistory} from '../redux/actions/history'
 
 class TransactionDetail extends Component {
   constructor(props){
     super(props)
-    this.checkToken = () => {
-      if(!localStorage.getItem('token')){
-				props.history.push('/admin')
-				swal.fire({
-					icon: 'error',
-					title: 'Nooooo!',
-					text: 'You have to login first'
-				})
-      }
-    }
     this.state = {
       showAddModal: false,
       showPenaltyModal: false,
@@ -91,8 +84,7 @@ class TransactionDetail extends Component {
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
-  async addHistory (event) {
-		const {REACT_APP_URL} = process.env
+  addHistory (event) {
 		const dataSubmit = {
       transaction_id: this.state.id,
       title: this.state.title,
@@ -100,8 +92,7 @@ class TransactionDetail extends Component {
       employee: this.state.employee,
       date: this.state.created_at
     }
-		const url = `${REACT_APP_URL}histories`
-		await axios.post(url, dataSubmit).then( (response) => {
+		this.props.postHistory(dataSubmit).then( (response) => {
 				console.log(response);
 			})
 			.catch(function (error) {
@@ -115,9 +106,8 @@ class TransactionDetail extends Component {
 		this.props.history.push(`/transactions`)
 	}
   deleteTransaction(){
-    const {REACT_APP_URL} = process.env
-    console.log(this.state.id)
-    axios.delete(`${REACT_APP_URL}transactions/${this.state.id}`)
+    const {id} = this.state
+    this.props.deleteTransaction(id)
     this.setState({showDeleteModal: !this.state.showDeleteModal})
     this.addHistory()
     this.props.history.push('/transactions')
@@ -128,14 +118,12 @@ class TransactionDetail extends Component {
     })
   }
   setAcc(){
-    const {REACT_APP_URL} = process.env
-    console.log(this.state.id)
+    const {id} = this.state
 		const token = JSON.parse(localStorage.getItem('token'))
-    const transactionData = {
-      employee_id: token.id
+    const dataSubmit = {
+      employee_id: 8 //token.id
     }
-    const url = `${REACT_APP_URL}transactions/acc/${this.state.id}`
-    axios.patch(url, transactionData)
+    this.props.accTransaction(id, dataSubmit)
     this.setState({showDeleteModal: !this.state.showDeleteModal})
     this.props.history.push('/transactions')
     swal.fire({
@@ -145,9 +133,8 @@ class TransactionDetail extends Component {
     })
   }
   setPenalty(){
-    const {REACT_APP_URL} = process.env
-    console.log(this.state.id)
-    axios.patch(`${REACT_APP_URL}transactions/penalty/${this.state.id}`)
+    const {id} = this.state
+    this.props.penaltyTransaction(id)
     this.setState({showDeleteModal: !this.state.showDeleteModal})
     this.props.history.push('/transactions')
     swal.fire({
@@ -171,8 +158,18 @@ class TransactionDetail extends Component {
       showAccModal: !this.state.showAccModal
     })
   }
-  async componentDidMount(){
-		this.checkToken()
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
+  componentDidMount(){
+	  this.authCheck()
   }
 
   render(){
@@ -216,7 +213,7 @@ class TransactionDetail extends Component {
           <Col className='mt-5'>
             <div className='d-flex justify-content-between container'>
               <div className='mt-5'>
-                <h4><Link to='/administrators'><a className='text-dark mb-5'>Transactions</a></Link> &gt; Detail</h4>
+                <h4><Link to='/transactions'><a className='text-dark mb-5'>Transactions</a></Link> &gt; Detail</h4>
               </div>
             </div>
           </Col>
@@ -309,7 +306,7 @@ class TransactionDetail extends Component {
          <Modal isOpen={this.state.showPenaltyModal}>
             <ModalBody className='h4'>Are you sure?</ModalBody>
             <ModalFooter>
-              <Button color='danger' onClick={this.setAcc}>Penalty</Button>
+              <Button color='danger' onClick={this.setPenalty}>Penalty</Button>
               <Button color='secondary' onClick={this.togglePenaltyModal}>Cancel</Button>
             </ModalFooter>
           </Modal>
@@ -336,4 +333,15 @@ class TransactionDetail extends Component {
   }
 }
 
-export default TransactionDetail
+const mapStateToProps = state => ({
+  loginL: state.login
+})
+
+const mapDispatchToProps = {
+  deleteTransaction, 
+  penaltyTransaction, 
+  accTransaction,
+  postHistory
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TransactionDetail)

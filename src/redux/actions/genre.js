@@ -9,6 +9,14 @@ return {
   }
 }
 
+const getGenreId = (id) =>{
+  const url = `${REACT_APP_URL}genres/${id}`
+  return {
+    type: 'GETGENREID',
+    payload: axios().get(url)
+  }
+}
+
 const postGenre = (dataSubmit) =>{
 const url = `${REACT_APP_URL}genres`
 return {
@@ -34,4 +42,4 @@ return {
 }
 
 
-export {getGenre, deleteGenre, postGenre, patchGenre}
+export {getGenre, getGenreId, deleteGenre, postGenre, patchGenre}

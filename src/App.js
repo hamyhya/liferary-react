@@ -5,8 +5,9 @@ import {
   Route
 } from 'react-router-dom'
 import {Provider} from 'react-redux'
+import {PersistGate} from 'redux-persist/integration/react'
 
-import store from './redux/store'
+import {store, persistor} from './redux/store'
 
 import Register from './page/Register'
 import Detail from './page/Detail'
@@ -33,26 +34,28 @@ class App extends Component {
       <>
         <Provider store={store}>
           <BrowserRouter>
-            <Switch>
-              <Route path='/' exact component={LandingPage} />
-              <Route path='/login' component={Login}/>
-              <Route path='/admin' component={LoginAdmin}/>
-              <Route path='/register' component={Register} />
-              <Route path='/dashboard' component={List} />
-              <Route path='/dashboard-user' component={ListUsers} />
-              <Route path='/administrators' component={Administrators} />
-              <Route path='/administrators-detail/:id' component={AdministratorsDetail} />
-              <Route path='/transactions' component={Transactions} />
-              <Route path='/transactions-detail/:id' component={TransactionDetail} />
-              <Route path='/detail/:id' component={Detail} />
-              <Route path='/detail-user/:id' component={DetailUsers} />
-              <Route path='/users' component={Users} />
-              <Route path='/users-detail/:id' component={UserDetail} />
-              <Route path='/histories' component={Histories} />
-              <Route path='/histories-user' component={HistoriesUser} />
-              <Route path='/genres' component={Genres} />
-              <Route path='/genres-detail/:id' component={GenreDetail} />
-            </Switch>
+            <PersistGate persistor={persistor}>
+              <Switch>
+                <Route path='/' exact component={LandingPage} />
+                <Route path='/login' component={Login}/>
+                <Route path='/admin' component={LoginAdmin}/>
+                <Route path='/register' component={Register} />
+                <Route path='/dashboard' component={List} />
+                <Route path='/dashboard-user' component={ListUsers} />
+                <Route path='/administrators' component={Administrators} />
+                <Route path='/administrators-detail/:id' component={AdministratorsDetail} />
+                <Route path='/transactions' component={Transactions} />
+                <Route path='/transactions-detail/:id' component={TransactionDetail} />
+                <Route path='/detail/:id' component={Detail} />
+                <Route path='/detail-user/:id' component={DetailUsers} />
+                <Route path='/users' component={Users} />
+                <Route path='/users-detail/:id' component={UserDetail} />
+                <Route path='/histories' component={Histories} />
+                <Route path='/histories-user' component={HistoriesUser} />
+                <Route path='/genres' component={Genres} />
+                <Route path='/genres-detail/:id' component={GenreDetail} />
+              </Switch>
+            </PersistGate>
           </BrowserRouter>
         </Provider>
       </>

@@ -31,16 +31,6 @@ import {getAdmin, postAdmin} from '../redux/actions/admin'
 class Administrators extends Component {
   constructor(props){
     super(props)
-    // this.authCheck = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showAddModal: false,
       showNavbar: false,
@@ -136,8 +126,18 @@ class Administrators extends Component {
 			}
 		})
   }
+  checkLogin = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
   async componentDidMount(){
-		// this.authCheck()
+		this.checkLogin()
     const param = qs.parse(this.props.location.search.slice(1))
     await this.fetchData(param)
   }
@@ -311,7 +311,8 @@ class Administrators extends Component {
 }
 
 const mapStateToProps = state => ({
-  admin: state.admin
+  admin: state.admin,
+  login: state.login
 })
 
 const mapDispatchToProps = {getAdmin, postAdmin}

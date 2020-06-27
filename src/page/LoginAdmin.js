@@ -26,7 +26,7 @@ class LoginAdmin extends Component {
   handlerChange = (e) =>{
 		this.setState({[e.target.name]: e.target.value})
 	}
-  async LoginAdmin (event) {
+  LoginAdmin (event) {
 		event.preventDefault()
 		// const {REACT_APP_URL} = process.env
 		const {email, password} = this.state
@@ -77,7 +77,6 @@ class LoginAdmin extends Component {
 		// 	 })
   }
   checkLogin = () => {
-    console.log(this.props.login.token)
     if(this.props.login.token !== null){
       this.props.history.push('/dashboard')
     }

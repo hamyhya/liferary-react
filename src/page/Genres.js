@@ -31,16 +31,6 @@ import {getGenre, postGenre} from '../redux/actions/genre'
 class Genres extends Component {
   constructor(props){
     super(props)
-    // this.checkToken = () => {
-    //   if(!localStorage.getItem('token')){
-		// 		props.history.push('/admin')
-		// 		swal.fire({
-		// 			icon: 'error',
-		// 			title: 'Nooooo!',
-		// 			text: 'You have to login first'
-		// 		})
-    //   }
-    // }
     this.state = {
       showNavbar: false,
       showAddModal: false,
@@ -114,7 +104,7 @@ class Genres extends Component {
       showDeleteModal: !this.state.showDeleteModal
     })
   }
-  fetchData = async (params) => {
+  fetchData = (params) => {
     const param = `${qs.stringify(params)}`
 		this.props.getGenre(param).then( (response) => {
 
@@ -126,10 +116,20 @@ class Genres extends Component {
 			}
 		})
   }
-  async componentDidMount(){
-		// this.checkToken()
+  authCheck = () => {
+    if((this.props.login.token === null)){
+			this.props.history.push('/admin')
+			swal.fire({
+				icon: 'error',
+				title: 'Oopss!',
+				text: "You've to login first"
+			})
+    }
+  }
+  componentDidMount(){
+		this.authCheck()
     const param = qs.parse(this.props.location.search.slice(1))
-    await this.fetchData(param)
+    this.fetchData(param)
   }
 
   render(){
@@ -293,7 +293,8 @@ class Genres extends Component {
 }
 
 const mapStateToProps = state => ({
-  genre: state.genre
+  genre: state.genre,
+  login: state.login
 })
 
 const mapDispatchToProps = {getGenre, postGenre}

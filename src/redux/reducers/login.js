@@ -31,6 +31,14 @@ const login = (state=initialState, action) => {
         token: action.payload.data.token
       }
     }
+    case 'LOGOUT': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        token: null
+      }
+    }
     default: {
       return {
         ...state

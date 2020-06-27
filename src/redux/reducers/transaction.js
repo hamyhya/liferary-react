@@ -3,21 +3,20 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMsg: '',
-  dataGenre: [],
-  dataGenreId: '',
+  dataTransaction: [],
   pageInfo: []
 }
 
-const genre = (state=initialState, action) => {
+const transaction = (state=initialState, action) => {
   switch(action.type){
-    case 'GETGENRE_PENDING': {
+    case 'GETTRANSACTION_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETGENRE_REJECTED': {
+    case 'GETTRANSACTION_REJECTED': {
       return {
         ...state,
         isLoading: false,
@@ -25,96 +24,93 @@ const genre = (state=initialState, action) => {
         errorMsg: action.payload.response.data.message,
       }
     }
-    case 'GETGENRE_FULFILLED': {
+    case 'GETTRANSACTION_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false,
-        dataGenre: action.payload.data.data,
+        dataTransaction: action.payload.data.data,
         pageInfo: action.payload.data.pageInfo
       }
     }
-    case 'GETGENREID_PENDING': {
+    case 'POSTTRANSACTION_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETGENREID_REJECTED': {
-      return {
-        ...state,
-        isLoading: false,
-        isError: true,
-        errorMsg: action.payload.response.data.message,
-      }
-    }
-    case 'GETGENREID_FULFILLED': {
-      return {
-        ...state,
-        isLoading: false,
-        isError: false,
-        dataGenreId: action.payload.data.data.name,
-        pageInfo: action.payload.data.pageInfo
-      }
-    }
-    case 'POSTGENRE_PENDING': {
-      return {
-        ...state,
-        isLoading: true,
-        isError: false
-      }
-    }
-    case 'POSTGENRE_REJECTED': {
+    case 'POSTTRANSACTION_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'POSTGENRE_FULFILLED': {
+    case 'POSTTRANSACTION_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'PATCHGENRE_PENDING': {
+    case 'PENALTYTRANSACTION_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'PATCHGENRE_REJECTED': {
+    case 'PENALTYTRANSACTION_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'PATCHGENRE_FULFILLED': {
+    case 'PENALTYTRANSACTION_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'DELETEGENRE_PENDING': {
+    case 'ACCTRANSACTION_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'DELETEGENRE_REJECTED': {
+    case 'ACCTRANSACTION_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'DELETEGENRE_FULFILLED': {
+    case 'ACCTRANSACTION_FULFILLED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: false
+      }
+    }
+    case 'DELETETRANSACTION_PENDING': {
+      return {
+        ...state,
+        isLoading: true,
+        isError: false
+      }
+    }
+    case 'DELETETRANSACTION_REJECTED': {
+      return {
+        ...state,
+        isLoading: false,
+        isError: true
+      }
+    }
+    case 'DELETETRANSACTION_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -129,4 +125,4 @@ const genre = (state=initialState, action) => {
   }
 }
 
-export default genre
+export default transaction

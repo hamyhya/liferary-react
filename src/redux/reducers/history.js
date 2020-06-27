@@ -3,21 +3,20 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMsg: '',
-  dataGenre: [],
-  dataGenreId: '',
+  dataHistory: [],
   pageInfo: []
 }
 
-const genre = (state=initialState, action) => {
+const history = (state=initialState, action) => {
   switch(action.type){
-    case 'GETGENRE_PENDING': {
+    case 'GETHISTORY_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETGENRE_REJECTED': {
+    case 'GETHISTORY_REJECTED': {
       return {
         ...state,
         isLoading: false,
@@ -25,96 +24,72 @@ const genre = (state=initialState, action) => {
         errorMsg: action.payload.response.data.message,
       }
     }
-    case 'GETGENRE_FULFILLED': {
+    case 'GETHISTORY_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false,
-        dataGenre: action.payload.data.data,
+        dataHistory: action.payload.data.data,
         pageInfo: action.payload.data.pageInfo
       }
     }
-    case 'GETGENREID_PENDING': {
+    case 'POSTHISTORY_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'GETGENREID_REJECTED': {
-      return {
-        ...state,
-        isLoading: false,
-        isError: true,
-        errorMsg: action.payload.response.data.message,
-      }
-    }
-    case 'GETGENREID_FULFILLED': {
-      return {
-        ...state,
-        isLoading: false,
-        isError: false,
-        dataGenreId: action.payload.data.data.name,
-        pageInfo: action.payload.data.pageInfo
-      }
-    }
-    case 'POSTGENRE_PENDING': {
-      return {
-        ...state,
-        isLoading: true,
-        isError: false
-      }
-    }
-    case 'POSTGENRE_REJECTED': {
+    case 'POSTHISTORY_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'POSTGENRE_FULFILLED': {
+    case 'POSTHISTORY_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'PATCHGENRE_PENDING': {
+    case 'PATCHHISTORY_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'PATCHGENRE_REJECTED': {
+    case 'PATCHHISTORY_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'PATCHGENRE_FULFILLED': {
+    case 'PATCHHISTORY_FULFILLED': {
       return {
         ...state,
         isLoading: false,
         isError: false
       }
     }
-    case 'DELETEGENRE_PENDING': {
+    case 'DELETEHISTORY_PENDING': {
       return {
         ...state,
         isLoading: true,
         isError: false
       }
     }
-    case 'DELETEGENRE_REJECTED': {
+    case 'DELETEHISTORY_REJECTED': {
       return {
         ...state,
         isLoading: false,
         isError: true
       }
     }
-    case 'DELETEGENRE_FULFILLED': {
+    case 'DELETEHISTORY_FULFILLED': {
       return {
         ...state,
         isLoading: false,
@@ -129,4 +104,4 @@ const genre = (state=initialState, action) => {
   }
 }
 
-export default genre
+export default history
