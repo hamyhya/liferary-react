@@ -141,7 +141,7 @@ class ListUsers extends Component {
 						<Jumbotron className='carousel-books mt-5'>
 							<Carousel id='carousel'>
 								{dataBook.map((book, index) => (
-									<Carousel.Item id='carousel-item'>
+									<Carousel.Item id='carousel-item' key={index}>
 										<img style={{ height: '200px' }}
 											className="d-block"
 											src={book.picture}
@@ -182,7 +182,7 @@ class ListUsers extends Component {
 								<Row>
 									<CardDeck>
 									{dataBook.map((book, index) => (
-										<Col className='mt-4' md={4}>
+										<Col className='mt-4' md={4} key={index}>
 											<Card>
 												<CardImg top width="100%" src={book.picture} alt="Card image cap" />
 												<CardBody>

@@ -93,7 +93,7 @@ class LoginAdmin extends Component {
                         <span>Remember Me</span>
                       </Label>
                     </FormGroup>
-                    <div><a href='#'><Link to='/login'>User</Link></a></div>
+                    <div><Link to='/login'>User</Link></div>
                   </div>
                   <div className='mt-4'>
                     <Button type='submit' className='btn right-btn' to='/dashboard'>Login</Button>

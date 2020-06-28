@@ -108,7 +108,7 @@ class DetailUsers extends Component {
           </div>
           <div className="book-details container">
             <div className="tag">
-              <h4><span class="badge badge-detail text-white">{dataGenreId}</span></h4>
+              <h4><span className="badge badge-detail text-white">{dataGenreId}</span></h4>
               
               </div>
             <Row>

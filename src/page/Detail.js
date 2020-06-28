@@ -143,8 +143,8 @@ class Detail extends Component {
                 <Link to='/dashboard' className='btn back-btn btn-lg btn-light'>Back</Link>
               </div>
               <div className='option-btn'>
-              <h3 className='text-white'><Link><a onClick={this.toggleEditModal}>Edit</a></Link> 
-              &nbsp;| <Link><a onClick={this.toggleDeleteModal}>Delete</a></Link></h3>
+              <h3 className='text-white'><a onClick={this.toggleEditModal}>Edit</a> 
+              &nbsp;| <a onClick={this.toggleDeleteModal}>Delete</a></h3>
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ class Detail extends Component {
           </div>
           <div className="book-details container">
             <div className="tag">
-              <h4><span class="badge badge-detail text-white">{dataGenreId}</span></h4>
+              <h4><span className="badge badge-detail text-white">{dataGenreId}</span></h4>
               
               </div>
             <Row>

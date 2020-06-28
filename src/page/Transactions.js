@@ -126,31 +126,31 @@ class Transactions extends Component {
         <Row className='d-flex flex-column w-100'>
           <Col className='w-100'>
             <Navbar className='nav-dashboard fixed-top' light expand="md">
-						<Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						  <Link to='/dashboard' className='navbar-brand text-white'>Liferary</Link>
               <NavbarToggler onClick={this.toggleNavbar} />
               <Collapse isOpen={this.state.showNavbar} navbar>
                 <Nav className="mr-auto" navbar>
                   <NavItem>
-                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+                    <Link to='/transactions' className='nav-link text-white'>Transactions</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+                    <Link to='/histories' className='nav-link text-white'>Histories</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+                    <Link to='/administrators' className='nav-link text-white'>Administrators</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                    <Link to='/users' className='nav-link text-white'>Users</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                    <Link to='/genres' className='nav-link text-white'>Genres</Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">
                     <Form className="form-inline">
-                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
-                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
-                      <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2" type='button'>Logout</Button>
+                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2 mt-1" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2 mt-1" type='button'>Search</Button>
+                      <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2 mt-1" type='button'>Logout</Button>
                     </Form>
                   </span>
                 </Collapse>
@@ -158,8 +158,8 @@ class Transactions extends Component {
           </Col>
           {isLoading ? (
             <center className='mt-5'>
-              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
-                <span class="sr-only">Loading...</span>
+              <div className="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span className="sr-only">Loading...</span>
               </div>
             </center>
           ):(
@@ -200,7 +200,7 @@ class Transactions extends Component {
                     </thead>
                     <tbody>
                       {dataTransaction.map((transactions, index) => (
-                      <tr>
+                      <tr key={index}>
                         <th scope="row">{transactions.id}</th>
                         <td>{transactions.title}</td>
                         <td>{transactions.user}</td>
@@ -219,7 +219,7 @@ class Transactions extends Component {
                                 status: `${transactions.status}`,
                                 created_at: `${transactions.created_at}`
                               }
-                            }}><a>More...</a></Link></h6>
+                            }}>More...</Link></h6>
                         </td>
                       </tr>
                       ))}
@@ -255,53 +255,6 @@ class Transactions extends Component {
             </div>
           </Col>
         </Row>
-
-        {/* Add Modal */}
-        <Modal isOpen={this.state.showAddModal}>
-          <ModalHeader className='h1'>Add Book</ModalHeader>
-          <ModalBody>
-            <h6>Title</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Description</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Image URL</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Author</h6>
-            <Input type='text' className='mb-2'/>
-            <h6>Genre</h6>
-            <Input type='text' className='mb-2'/>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Add</Button>
-            <Button color='secondary' onClick={this.toggleAddModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
-        {/* Edit Modal */}
-        <Modal isOpen={this.state.showEditModal}>
-          <ModalHeader className='h1'>Edit Transaction</ModalHeader>
-          <ModalBody>
-            <h6>Status</h6>
-            <Input type="select" name="select" id="exampleSelect">
-              <option>Returned</option>
-              <option>Pending</option>
-              <option>Penalty</option>
-            </Input>
-          </ModalBody>
-          <ModalFooter>
-            <Button color='primary' onClick=''>Edit</Button>
-            <Button color='secondary' onClick={this.toggleEditModal}>Cancel</Button>
-          </ModalFooter>
-        </Modal>
-
-         {/* Delete Modal */}
-         <Modal isOpen={this.state.showDeleteModal}>
-            <ModalBody className='h4'>Are you sure?</ModalBody>
-            <ModalFooter>
-              <Button color='danger' onClick=''>Delete</Button>
-              <Button color='secondary' onClick={this.toggleDeleteModal}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
 
            {/* Logout Modal */}
 				<Modal isOpen={this.state.showLogoutModal}>

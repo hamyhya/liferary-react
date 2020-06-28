@@ -159,24 +159,24 @@ deleteGenre(){
         <Row className='d-flex flex-column w-100'>
           <Col className='w-100'>
             <Navbar className='nav-dashboard fixed-top' light expand="md">
-						  <Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						  <Link to='/dashboard' className='navbar-brand text-white'>Liferary</Link>
               <NavbarToggler onClick={this.toggleNavbar} />
               <Collapse isOpen={this.state.showNavbar} navbar>
                 <Nav className="mr-auto" navbar>
                   <NavItem>
-                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+                    <Link to='/transactions' className='nav-link text-white'>Transactions</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+                    <Link to='/histories' className='nav-link text-white'>Histories</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+                    <Link to='/administrators' className='nav-link text-white'>Administrators</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                    <Link to='/users' className='nav-link text-white'>Users</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                    <Link to='/genres' className='nav-link text-white'>Genres</Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">
@@ -190,13 +190,14 @@ deleteGenre(){
           <Col className='mt-5'>
             <div className='d-flex justify-content-between container'>
               <div className='mt-5'>
-                <h4><Link to='/genres'><a className='text-dark mb-5'>Genres</a></Link> &gt; Detail</h4>
+                <h4><Link to='/genres' className='text-dark mb-5'>Genres</Link> &gt; Detail</h4>
               </div>
             </div>
           </Col>
           <Col className='mt-1'>
             <div className='container'>
               <Table bordered className='mt-5'>
+                <tbody>
                   <tr>
                     <td><h6>Genre ID</h6></td>
                     <td>{this.state.id}</td>
@@ -205,6 +206,7 @@ deleteGenre(){
                     <td><h6>Name</h6></td>
                     <td>{this.state.name}</td>
                   </tr>
+                </tbody>
               </Table>
               <div className='mt-4'>
                 <Button className='btn-warning' onClick={this.toggleEditModal}>Edit</Button>

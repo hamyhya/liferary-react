@@ -84,12 +84,12 @@ class LandingPage extends Component {
                 <Row className=''>
                   <CardDeck>
                   {this.state.data.map((book, index) => (
-                    <Col className='mt-4' md={4}>
+                    <Col className='mt-4' md={4} key={index}>
                       <Card>
                         <CardImg top width="100%" src={book.picture} alt="Card image cap" />
                         <CardBody>
                           <CardTitle>
-                            <h4><Link to='/login'><a className='text-black'>{book.title}</a></Link></h4>
+                            <h4><Link to='/login' className='text-black'>{book.title}</Link></h4>
                           </CardTitle>
                           <CardSubtitle>By <b>{book.author}</b></CardSubtitle>
                           <CardText>{book.description}</CardText>

@@ -7,17 +7,14 @@ import {Row,
   Form, 
   Button,
   Modal, 
-  ModalBody, 
-  ModalHeader, 
+  ModalBody,
   Input, 
   Table, 
   ModalFooter, 
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {Dropdown} from 'react-bootstrap'
 import {
   Link
@@ -110,12 +107,12 @@ class HistoriesUser extends Component {
         <Row className='d-flex flex-column w-100'>
           <Col className='w-100'>
             <Navbar className='nav-dashboard fixed-top' light expand="md">
-						  <Link to='/dashboard-user'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						  <Link to='/dashboard-user' className='navbar-brand text-white'>Liferary</Link>
               <NavbarToggler onClick={this.toggleNavbar} />
               <Collapse isOpen={this.state.showNavbar} navbar>
                 <Nav className="mr-auto" navbar>
                   <NavItem>
-                    <Link to='/histories-user'><NavLink className='text-white'>My Histories</NavLink></Link>
+                    <Link to='/histories-user' className='nav-link text-white'>My Histories</Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">

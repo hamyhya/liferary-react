@@ -1,5 +1,4 @@
-import React, {Component, useState} from 'react'
-import axios from 'axios'
+import React, {Component} from 'react'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -16,12 +15,9 @@ import {Row,
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {Dropdown} from 'react-bootstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'
@@ -153,24 +149,24 @@ class Genres extends Component {
         <Row className='d-flex flex-column w-100'>
           <Col className='w-100'>
             <Navbar className='nav-dashboard fixed-top' light expand="md">
-						  <Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
+						  <Link to='/dashboard' className='navbar-brand text-white'>Liferary</Link>
               <NavbarToggler onClick={this.toggleNavbar} />
               <Collapse isOpen={this.state.showNavbar} navbar>
                 <Nav className="mr-auto" navbar>
                   <NavItem>
-                    <Link to='/transactions'><NavLink className='text-white'>Transactions</NavLink></Link>
+                    <Link to='/transactions' className='nav-link text-white'>Transactions</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/histories'><NavLink className='text-white'>Histories</NavLink></Link>
+                    <Link to='/histories' className='nav-link text-white'>Histories</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/administrators'><NavLink className='text-white'>Administrators</NavLink></Link>
+                    <Link to='/administrators' className='nav-link text-white'>Administrators</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/users'><NavLink className='text-white'>Users</NavLink></Link>
+                    <Link to='/users' className='nav-link text-white'>Users</Link>
                   </NavItem>
                   <NavItem>
-                    <Link to='/genres'><NavLink className='text-white'>Genres</NavLink></Link>
+                    <Link to='/genres' className='nav-link text-white'>Genres</Link>
                   </NavItem>
                 </Nav>
                   <span className="navbar-text">
@@ -185,8 +181,8 @@ class Genres extends Component {
           </Col>
           {isLoading ? (
             <center className='mt-5'>
-              <div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
-                <span class="sr-only">Loading...</span>
+              <div className="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+                <span className="sr-only">Loading...</span>
               </div>
             </center>
           ):(
@@ -226,7 +222,7 @@ class Genres extends Component {
                     </thead>
                     <tbody>
                       {dataGenre.map((genre, index) => (
-                      <tr>
+                      <tr key={index}>
                         <th scope="row">{genre.id}</th>
                         <td>{genre.name}</td>
                         <td>
@@ -236,7 +232,7 @@ class Genres extends Component {
                                 id: `${genre.id}`,
                                 name: `${genre.name}`
                               }
-                            }}><a>More... </a></Link></h6> 
+                            }}>More... </Link></h6> 
                         </td>
                       </tr>
                       ))}

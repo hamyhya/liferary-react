@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react'
+import React, {Component} from 'react'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
@@ -6,13 +6,12 @@ import {Row, Col, Nav, Form, Button, Modal, ModalBody,
   Navbar,
   NavbarToggler,
   NavbarBrand,
-  NavItem,
-  NavLink,Card, CardImg, CardTitle, CardText, CardDeck,
+	NavItem,
+	Card, CardImg, CardTitle, CardText, CardDeck,
 	CardSubtitle, CardBody} from 'reactstrap'
 import Select from 'react-select'
 import { Carousel, Jumbotron, Dropdown } from 'react-bootstrap'
 import {
-	BrowserRouter as Router,
 	Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'
@@ -162,40 +161,40 @@ class List extends Component {
 				<Row className='d-flex flex-column w-100'>
 				<Col className='w-100'>
 					<Navbar className='nav-dashboard fixed-top' light expand="md">
-						<Link to='/dashboard'><NavbarBrand className='text-white'>Liferary</NavbarBrand></Link>
-						<NavbarToggler onClick={this.toggleNavbar} />
-						<Collapse isOpen={this.state.showNavbar} navbar>
-							<Nav className="mr-auto" navbar>
-								<NavItem>
-									<Link className='nav-link text-white' to='/transactions'>Transactions</Link>
-								</NavItem>
-								<NavItem>
-									<Link className='nav-link text-white' to='/histories'>Histories</Link>
-								</NavItem>
-								<NavItem>
-									<Link className='nav-link text-white' to='/administrators'>Administrators</Link>
-								</NavItem>
-								<NavItem>
-									<Link className='nav-link text-white' to='/users'>Users</Link>
-								</NavItem>
-                <NavItem>
-                  <Link className='nav-link text-white' to='/genres'>Genres</Link>
-                </NavItem>
-							</Nav>
-								<span className="navbar-text">
-									<Form className="form-inline">
-										<Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2" type="search" placeholder="Search ..." aria-label="Search" />
-										<Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2" type='button'>Search</Button>
-										<Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2" type='button'>Logout</Button>
-									</Form>
-								</span>
-							</Collapse>
-						</Navbar>
+						  <Link to='/dashboard' className='navbar-brand text-white'>Liferary</Link>
+              <NavbarToggler onClick={this.toggleNavbar} />
+              <Collapse isOpen={this.state.showNavbar} navbar>
+                <Nav className="mr-auto" navbar>
+                  <NavItem>
+                    <Link to='/transactions' className='nav-link text-white'>Transactions</Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/histories' className='nav-link text-white'>Histories</Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/administrators' className='nav-link text-white'>Administrators</Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/users' className='nav-link text-white'>Users</Link>
+                  </NavItem>
+                  <NavItem>
+                    <Link to='/genres' className='nav-link text-white'>Genres</Link>
+                  </NavItem>
+                </Nav>
+                  <span className="navbar-text">
+                    <Form className="form-inline">
+                      <Input onChange={e => this.setState({search: e.target.value})} className="form-control mr-sm-2 mt-1" type="search" placeholder="Search ..." aria-label="Search" />
+                      <Button onClick={()=>this.fetchData({...params, search: this.state.search})} className="btn-search form-control mr-sm-2 mt-1" type='button'>Search</Button>
+                      <Button onClick={this.toggleLogoutModal} className="btn-danger form-control mr-sm-2 mt-1" type='button'>Logout</Button>
+                    </Form>
+                  </span>
+                </Collapse>
+              </Navbar>
 				</Col>
 				{isLoading ? (
 					<center className='mt-5'>
-						<div class="d-flex align-items-center spinner-border text-dark mt-5" role="status">
-							<span class="sr-only">Loading...</span>
+						<div className="d-flex align-items-center spinner-border text-dark mt-5" role="status">
+							<span className="sr-only">Loading...</span>
 						</div>
 					</center>
 				):(
@@ -205,7 +204,7 @@ class List extends Component {
 								<Jumbotron className='carousel-books mt-5'>
 									<Carousel>
 										{dataBook.map((book, index) => (
-											<Carousel.Item>
+											<Carousel.Item key={index}>
 												<img style={{ height: '200px' }}
 													className="d-block"
 													src={book.picture}
@@ -249,7 +248,7 @@ class List extends Component {
 								<Row>
 									<CardDeck>
 									{dataBook.map((book, index) => (
-										<Col className='mt-4' md={4}>
+										<Col className='mt-4' md={4} key={index}>
 											<Card>
 												<CardImg top width="100%" src={book.picture} alt="Card image cap" />
 												<CardBody>
@@ -263,7 +262,7 @@ class List extends Component {
 																author: `${book.author}`,
 																picture: `${book.picture}`
 															}
-														}}><a className='text-black'>{book.title}</a></Link></h4></CardTitle>
+														}} className='text-black'>{book.title}</Link></h4></CardTitle>
 													<CardSubtitle>By <b>{book.author}</b></CardSubtitle>
 													<CardText>{book.description}</CardText>
 												</CardBody>
