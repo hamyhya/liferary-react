@@ -28,7 +28,7 @@ import jwt from 'jsonwebtoken'
 import {connect} from 'react-redux'
 
 import {getAdmin, postAdmin} from '../redux/actions/admin'
-import {logoutAuth} from '../redux/actions/login'
+import {logoutAuth, registerAdmin} from '../redux/actions/login'
 
 class Administrators extends Component {
   constructor(props){
@@ -69,35 +69,29 @@ class Administrators extends Component {
 		})
 	}
   handlerSubmit = (event) => {
-    event.preventDefault()
-    this.setState({isLoading: true})
-    const authorData = {
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password
+		event.preventDefault()
+		const dataSubmit = {
+      name: this.state.name,
+      email: this.state.email,
+      password: this.state.password
     }
-    
-    console.log(authorData)
-    const {REACT_APP_URL} = process.env
-    const url = `${REACT_APP_URL}employes`
-    axios.post(url, authorData).then( (response) => {
-        console.log(response)
+    const token = this.props.login.token
+
+    this.props.registerAdmin(dataSubmit, token).then((response) => {
+      this.props.history.push('/dashboard')
+      swal.fire({
+  			icon: 'success',
+  			title: 'Success',
+  			text: 'Register admin successfully'
       })
-      .catch(function (error) {
-        console.log(error.response)
-        swal.fire({
-					icon: 'error',
-					title: 'Oops!',
-					text: "Something's wrong, I can feel it"
-				})
-       }) 
-       swal.fire({
-        icon: 'success',
-        title: 'Success',
-        text: 'Yay! add admin success'
+    }).catch(function (error) {
+      swal.fire({
+        icon: 'error',
+        title: 'Hmmm!',
+        text: "Data already exist"
       })
-       this.props.history.push('/dashboard')
-}
+    })
+	}
   toggleAddModal(){
     this.setState({
       showAddModal: !this.state.showAddModal
@@ -322,6 +316,6 @@ const mapStateToProps = state => ({
   login: state.login
 })
 
-const mapDispatchToProps = {getAdmin, postAdmin, logoutAuth}
+const mapDispatchToProps = {getAdmin, postAdmin, logoutAuth, registerAdmin}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Administrators)

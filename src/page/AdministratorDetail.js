@@ -43,11 +43,6 @@ class AdministratorsDetail extends Component {
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
-  home = (e) =>{
-    e.preventDefault()
-    
-    this.props.history.push('/administrators')
-  }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
@@ -74,8 +69,9 @@ class AdministratorsDetail extends Component {
         password: this.state.password
     }
     
+    const token = this.props.login.token
     const {id} = this.state
-    this.props.patchAdmin(id, authorData).then( (response) => {
+    this.props.patchAdmin(id, authorData, token).then( (response) => {
         console.log(response)
       })
       .catch(function (error) {
@@ -95,7 +91,9 @@ class AdministratorsDetail extends Component {
 }
 deleteAdmin(){
   const {id} = this.state
-  this.props.deleteAdmin(id).then((response) => {
+  const token = this.props.login.token
+
+  this.props.deleteAdmin(id, token).then((response) => {
     swal.fire({
       icon: 'success',
       title: 'Success',

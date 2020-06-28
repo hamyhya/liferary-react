@@ -9,27 +9,27 @@ return {
   }
 }
 
-const postAdmin = (dataSubmit) =>{
+const postAdmin = (dataSubmit, token) =>{
 const url = `${REACT_APP_URL}employes`
 return {
   type: 'POSTADMIN',
-  payload: axios().post(url, dataSubmit)
+  payload: axios(token).post(url, dataSubmit)
   }
 }
 
-const patchAdmin = (id, dataSubmit) =>{
+const patchAdmin = (id, dataSubmit, token) =>{
 const url = `${REACT_APP_URL}employes/${id}`
 return {
   type: 'PATCHADMIN',
-  payload: axios().patch(url, dataSubmit)
+  payload: axios(token).patch(url, dataSubmit)
   }
 }
 
-const deleteAdmin = (id) =>{
+const deleteAdmin = (id, token) =>{
 const url = `${REACT_APP_URL}employes/${id}`
 return {
   type: 'DELETEADMIN',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 

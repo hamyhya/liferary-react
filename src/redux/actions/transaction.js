@@ -9,35 +9,35 @@ return {
   }
 }
 
-const postTransaction = (dataSubmit) =>{
+const postTransaction = (dataSubmit, token) =>{
 const url = `${REACT_APP_URL}transactions`
 return {
   type: 'POSTTRANSACTION',
-  payload: axios().post(url, dataSubmit)
+  payload: axios(token).post(url, dataSubmit)
   }
 }
 
-const penaltyTransaction = (id) =>{
+const penaltyTransaction = (id, token) =>{
 const url = `${REACT_APP_URL}transactions/penalty/${id}`
 return {
   type: 'PENALTYTRANSACTION',
-  payload: axios().patch(url)
+  payload: axios(token).patch(url)
   }
 }
 
-const accTransaction = (id, dataSubmit) =>{
+const accTransaction = (id, dataSubmit, token) =>{
   const url = `${REACT_APP_URL}transactions/acc/${id}`
   return {
     type: 'ACCTRANSACTION',
-    payload: axios().patch(url, dataSubmit)
+    payload: axios(token).patch(url, dataSubmit)
     }
   }
 
-const deleteTransaction = (id) =>{
+const deleteTransaction = (id, token) =>{
 const url = `${REACT_APP_URL}transactions/${id}`
 return {
   type: 'DELETETRANSACTION',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 

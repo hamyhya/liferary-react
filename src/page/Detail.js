@@ -57,7 +57,9 @@ class Detail extends Component {
   }
   deleteBook(){
     const {id} = this.state
-    this.props.deleteBook(id).then((response) => {
+    const token = this.props.login.token
+
+    this.props.deleteBook(id, token).then((response) => {
       swal.fire({
         icon: 'success',
         title: 'Success',
@@ -77,10 +79,12 @@ class Detail extends Component {
 		bookData.set('title', this.state.title)
 		bookData.set('description', this.state.description)
 		bookData.set('genre', this.state.genre)
-		bookData.set('author', this.state.author)
+    bookData.set('author', this.state.author)
     
+    
+    const token = this.props.login.token
     const {id} = this.state
-    this.props.patchBook(id, bookData).then( (response) => {
+    this.props.patchBook(id, bookData, token).then( (response) => {
       })
       .catch(function (error) {
         console.log(error.response);

@@ -17,11 +17,11 @@ const getHistoryUser = (param, dataSubmit) =>{
   }
 }
 
-const postHistory = (dataSubmit) =>{
+const postHistory = (dataSubmit, token) =>{
 const url = `${REACT_APP_URL}histories`
 return {
   type: 'POSTHISTORY',
-  payload: axios().post(url, dataSubmit)
+  payload: axios(token).post(url, dataSubmit)
   }
 }
 
@@ -33,11 +33,11 @@ return {
   }
 }
 
-const deleteHistory = () =>{
+const deleteHistory = (token) =>{
 const url = `${REACT_APP_URL}histories`
 return {
   type: 'DELETEHISTORY',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 

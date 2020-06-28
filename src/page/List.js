@@ -1,7 +1,6 @@
 import React, {Component, useState} from 'react'
 import swal from 'sweetalert2'
 import qs from 'querystring'
-import Token from '../services/Token'
 import {Row, Col, Nav, Form, Button, Modal, ModalBody, 
 	ModalHeader, ModalFooter, Input, Collapse,
   Navbar,
@@ -83,7 +82,9 @@ class List extends Component {
 		dataSubmit.set('genre', this.state.genre)
 		dataSubmit.set('author', this.state.author)
 
-		this.props.postBook(dataSubmit).then( (response) => {
+		const token = this.props.login.token
+
+		this.props.postBook(dataSubmit, token).then( (response) => {
 				console.log(response);
 				this.setState({showAddModal: false})
 				this.fetchData()
@@ -118,13 +119,7 @@ class List extends Component {
 	genreList = async () => {
 		const param = ''
 		this.props.getGenre(param).then( (response) => {
-
-			const pageInfo = this.props.genre.pageInfo
-	
-			this.setState({pageInfo})
-			if(param){
-					this.props.history.push(`?${param}`)
-			}
+			
 		})
 	}
 	checkLogin = () => {
@@ -159,7 +154,7 @@ class List extends Component {
 		
 		const params = qs.parse(this.props.location.search.slice(1))
 		params.page = params.page || 1
-		params.search = ''
+		params.search = params.search || ''
 		params.sort = params.sort || 0
 
 		return(

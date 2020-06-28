@@ -79,8 +79,10 @@ class Genres extends Component {
     const dataSubmit = {
         name: this.state.name,
     }
+
+    const token = this.props.login.token
     
-    this.props.postGenre(dataSubmit).then( (response) => {
+    this.props.postGenre(dataSubmit, token).then( (response) => {
         console.log(response)
       })
       .catch(function (error) {

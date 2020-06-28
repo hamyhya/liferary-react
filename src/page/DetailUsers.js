@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import swal from 'sweetalert2'
-import {Col, Row, Button, Modal, ModalHeader, 
-  ModalBody, ModalFooter, Input, Form} from 'reactstrap'
+import {Col, Row} from 'reactstrap'
 import {
   Link
 } from "react-router-dom";
@@ -39,8 +38,9 @@ class DetailUsers extends Component {
         user_id: this.state.token.id,
         employee_id: 7
     }
-    
-    this.props.postTransaction(authorData).then( (response) => {
+    const token = this.props.login.token
+
+    this.props.postTransaction(authorData, token).then( (response) => {
         console.log(response) 
         this.setState({ showBorrowModal: !this.state.showBorrowModal })
         swal.fire({

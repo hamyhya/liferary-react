@@ -73,7 +73,9 @@ class GenreDetail extends Component {
     }
     
     const {id} = this.state
-    this.props.patchGenre(id, dataSubmit).then( (response) => {
+    const token = this.props.login.token
+
+    this.props.patchGenre(id, dataSubmit, token).then( (response) => {
         swal.fire({
          icon: 'success',
          title: 'Success',
@@ -92,7 +94,9 @@ class GenreDetail extends Component {
 }
 deleteGenre(){
   const {id} = this.state
-  this.props.deleteGenre(id).then((response) => {
+  const token = this.props.login.token
+
+  this.props.deleteGenre(id, token).then((response) => {
     swal.fire({
       icon: 'success',
       title: 'Success',
@@ -142,7 +146,7 @@ deleteGenre(){
 		}
   }
   componentDidMount(){
-    this.authCheck()
+    this.checkLogin()
   }
 
   render(){

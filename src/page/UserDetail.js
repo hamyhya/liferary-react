@@ -53,11 +53,6 @@ class UserDetail extends Component {
     this.toggleEditModal = this.toggleEditModal.bind(this)
     this.toggleDeleteModal = this.toggleDeleteModal.bind(this)
   }
-  home = (e) =>{
-    e.preventDefault()
-    
-    this.props.history.push('/administrators')
-  }
   handlerChange = (e) => {
     this.setState({ [e.target.name] : e.target.value })
   }
@@ -77,7 +72,9 @@ class UserDetail extends Component {
 	}
   deleteUser(){
     const {id} = this.state
-    this.props.deleteUser(id).then((response) => {
+    const token = this.props.login.token
+
+    this.props.deleteUser(id, token).then((response) => {
       swal.fire({
         icon: 'success',
         title: 'Success',

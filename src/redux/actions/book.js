@@ -1,4 +1,3 @@
-import qs from 'querystring'
 import axios from '../../services/Axios'
 const {REACT_APP_URL} = process.env
 
@@ -10,27 +9,27 @@ return {
   }
 }
 
-const postBook = (dataSubmit) =>{
+const postBook = (dataSubmit, token) =>{
 const url = `${REACT_APP_URL}books`
 return {
   type: 'POSTBOOK',
-  payload: axios().post(url, dataSubmit)
+  payload: axios(token).post(url, dataSubmit)
   }
 }
 
-const patchBook = (id, bookData) =>{
+const patchBook = (id, bookData, token) =>{
 const url = `${REACT_APP_URL}books/${id}`
 return {
   type: 'PATCHBOOK',
-  payload: axios().patch(url, bookData)
+  payload: axios(token).patch(url, bookData)
   }
 }
 
-const deleteBook = (id) =>{
+const deleteBook = (id, token) =>{
 const url = `${REACT_APP_URL}books/${id}`
 return {
   type: 'DELETEBOOK',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 

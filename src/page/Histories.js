@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, 
@@ -74,7 +73,9 @@ class Histories extends Component {
     })
   }
   deleteHistory(){
-    this.props.deleteHistory().then((response) => {
+    const token = this.props.login.token
+
+    this.props.deleteHistory(token).then((response) => {
       this.setState({
         showDeleteModal: !this.state.showDeleteModal
       })
@@ -84,7 +85,7 @@ class Histories extends Component {
         text: 'Poof! history cleared'
       })
     })
-    this.props.history.push('/histories')
+    this.props.history.push('/dashboard')
   }
   fetchData = (params) => {
     const param = `${qs.stringify(params)}`

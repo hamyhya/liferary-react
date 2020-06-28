@@ -17,19 +17,19 @@ return {
   }
 }
 
-const patchUser = (id, dataSubmit) =>{
+const patchUser = (id, dataSubmit, token) =>{
 const url = `${REACT_APP_URL}users/${id}`
 return {
   type: 'PATCHUSER',
-  payload: axios().patch(url, dataSubmit)
+  payload: axios(token).patch(url, dataSubmit)
   }
 }
 
-const deleteUser = (id) =>{
+const deleteUser = (id, token) =>{
 const url = `${REACT_APP_URL}users/${id}`
 return {
   type: 'DELETEUSER',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 

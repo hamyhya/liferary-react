@@ -61,11 +61,6 @@ class TransactionDetail extends Component {
     this.togglePenaltyModal = this.togglePenaltyModal.bind(this)
     this.toggleAccModal = this.toggleAccModal.bind(this)
   }
-  home = (e) =>{
-    e.preventDefault()
-    
-    this.props.history.push('/administrators')
-  }
   toggleNavbar(){
 		this.setState({
 			showNavbar: !this.state.showNavbar
@@ -91,7 +86,9 @@ class TransactionDetail extends Component {
       employee: this.state.employee,
       date: this.state.created_at
     }
-		this.props.postHistory(dataSubmit).then( (response) => {
+    const token = this.props.login.token
+
+		this.props.postHistory(dataSubmit, token).then( (response) => {
 				console.log(response);
 			})
 			.catch(function (error) {
@@ -102,14 +99,15 @@ class TransactionDetail extends Component {
 				})
 				console.log(error);
 			 })
-		this.props.history.push(`/transactions`)
+		this.props.history.push(`/dashboard`)
 	}
   deleteTransaction(){
     const {id} = this.state
-    this.props.deleteTransaction(id)
+    const token = this.props.login.token
+    this.props.deleteTransaction(id, token)
     this.setState({showDeleteModal: !this.state.showDeleteModal})
     this.addHistory()
-    this.props.history.push('/transactions')
+    this.props.history.push('/dashboard')
     swal.fire({
       icon: 'success',
       title: 'Success',
@@ -121,9 +119,10 @@ class TransactionDetail extends Component {
     const dataSubmit = {
       employee_id: this.state.token.id
     }
-    this.props.accTransaction(id, dataSubmit)
+    const token = this.props.login.token
+    this.props.accTransaction(id, dataSubmit, token)
     this.setState({showAccModal: !this.state.showAccModal})
-    this.props.history.push('/transactions')
+    this.props.history.push('/dashboard')
     swal.fire({
       icon: 'success',
       title: 'Success',
@@ -132,9 +131,10 @@ class TransactionDetail extends Component {
   }
   setPenalty(){
     const {id} = this.state
-    this.props.penaltyTransaction(id)
+    const token = this.props.login.token
+    this.props.penaltyTransaction(id, token)
     this.setState({showPenaltyModal: !this.state.showPenaltyModal})
-    this.props.history.push('/transactions')
+    this.props.history.push('/dashboard')
     swal.fire({
       icon: 'success',
       title: 'Success',

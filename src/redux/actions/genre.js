@@ -17,27 +17,27 @@ const getGenreId = (id) =>{
   }
 }
 
-const postGenre = (dataSubmit) =>{
+const postGenre = (dataSubmit, token) =>{
 const url = `${REACT_APP_URL}genres`
 return {
   type: 'POSTGENRE',
-  payload: axios().post(url, dataSubmit)
+  payload: axios(token).post(url, dataSubmit)
   }
 }
 
-const patchGenre = (id, dataSubmit) =>{
+const patchGenre = (id, dataSubmit, token) =>{
 const url = `${REACT_APP_URL}genres/${id}`
 return {
   type: 'PATCHGENRE',
-  payload: axios().patch(url, dataSubmit)
+  payload: axios(token).patch(url, dataSubmit)
   }
 }
 
-const deleteGenre = (id) =>{
+const deleteGenre = (id, token) =>{
 const url = `${REACT_APP_URL}genres/${id}`
 return {
   type: 'DELETEGENRE',
-  payload: axios().delete(url)
+  payload: axios(token).delete(url)
   }
 }
 
