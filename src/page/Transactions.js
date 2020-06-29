@@ -7,20 +7,16 @@ import {Row,
   Form, 
   Button,
   Modal, 
-  ModalBody, 
-  ModalHeader, 
+  ModalBody,
   Input, 
   Table, 
   ModalFooter, 
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {Dropdown} from 'react-bootstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'

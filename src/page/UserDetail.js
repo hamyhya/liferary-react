@@ -15,9 +15,7 @@ import {Row,
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {
   Link
 } from "react-router-dom";

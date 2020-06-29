@@ -1,12 +1,9 @@
 import React, {Component} from 'react'
-import axios from 'axios'
-import qs from 'querystring'
 import Select from 'react-select'
 import swal from 'sweetalert2'
 import {Col, Row, Button, Modal, ModalHeader, 
   ModalBody, ModalFooter, Input, Form} from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'

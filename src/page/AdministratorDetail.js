@@ -1,16 +1,12 @@
 import React, {Component} from 'react'
-import axios from 'axios'
 import swal from 'sweetalert2'
 import qs from 'querystring'
 import {Row, Col, Form, Button, Modal, ModalBody, 
   ModalHeader, ModalFooter, Nav, Input, Table, Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'

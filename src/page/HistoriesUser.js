@@ -160,7 +160,7 @@ class HistoriesUser extends Component {
                     </thead>
                     <tbody>
                       {dataHistory.map((history, index) => (
-                      <tr>
+                      <tr key={index}>
                         <th scope="row">{history.id}</th>
                         <td>{history.transaction_id}</td>
                         <td>{history.title}</td>

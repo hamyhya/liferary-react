@@ -1,11 +1,10 @@
 import React, {Component} from 'react'
 import axios from 'axios'
 import qs from 'querystring'
-import {Row, Col, Input, Container, Table, Button, Navbar, Form, Card, CardImg, CardTitle, CardText, CardDeck,
+import {Row, Col, Input, Button, Navbar, Form, Card, CardImg, CardTitle, CardText, CardDeck,
 	CardSubtitle, CardBody
 } from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 

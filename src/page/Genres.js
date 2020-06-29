@@ -71,7 +71,6 @@ class Genres extends Component {
 	}
   handlerSubmit = (event) => {
     event.preventDefault()
-    this.setState({isLoading: true})
     const dataSubmit = {
         name: this.state.name,
     }

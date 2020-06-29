@@ -15,11 +15,8 @@ import {Row,
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
-  NavItem,
-  NavLink} from 'reactstrap'
+  NavItem} from 'reactstrap'
 import {
-  BrowserRouter as Router,
   Link
 } from "react-router-dom";
 import jwt from 'jsonwebtoken'
