@@ -75,14 +75,14 @@ class ListUsers extends Component {
 	authCheck = () => {
 		
     if((this.props.login.token === null)){
-			this.props.history.goback()
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',
 				text: "You've to login as user first"
 			})
     } else if (this.state.token.role !== 'user') {
-			this.props.history.goback()
+			this.props.history.goBack()
 			swal.fire({
 				icon: 'error',
 				title: 'Oopss!',

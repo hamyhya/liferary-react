@@ -65,7 +65,7 @@ class LandingPage extends Component {
                 <p>Love, Life, Library</p>
               </div>
               <div className='container mt-5'>
-                <Link to='/dashboard-user'><button className="btn btn-light my-2 my-sm-0 font-weight-bold" type="submit">Discover</button></Link>
+                <Link to='/login'><button className="btn btn-light my-2 my-sm-0 font-weight-bold" type="submit">Discover</button></Link>
               </div>
             </div>
           </div>
